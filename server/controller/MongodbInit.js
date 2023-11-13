@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 
 //测试链接缉
-mongoose.connect('mongodb://localhost:27017/mydatabase', { useNewUrlParser: true, useUnifiedTopology: true })  
-  .then(() => {  
-    console.log('Database connected');  
-  })  
-  .catch((err) => {  
-    console.error('Error connecting to database:', err);  
-  });
+function MongodbInit(){
+  mongoose.connect("mongodb://127.0.0.1:27017/SYLicense")
+//mongoose.connect("mongodb://sooyan:sy.3721@127.0.0.1/SYLicense")
+    .then(() => { console.log("连接数据库成功") })
+    .catch(() => { console.log("连接数据库失败") });
+}
+
+module.exports = MongodbInit

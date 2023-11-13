@@ -18,7 +18,7 @@
             <span>产品模块</span>
           </template>
           <!-- <router-link to="/ForceFeedback"><el-menu-item index="1-1">力反馈腹腔镜</el-menu-item></router-link> -->
-          <router-link to="/ForceFeedback"><el-menu-item index="1-2">虚实结合腹腔镜</el-menu-item></router-link>
+          <router-link style="  text-decoration: none;" to="/ForceFeedback"><el-menu-item index="1-2">虚实结合腹腔镜</el-menu-item></router-link>
             <el-menu-item index="1-3">消化内镜</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="2" height="100%">
@@ -26,7 +26,23 @@
             <el-icon><location /></el-icon>
             <span>发货信息</span>
           </template>
-          <router-link to="/UserAdd"><el-menu-item index="1-1">新增用户</el-menu-item></router-link>
+          <router-link style="  text-decoration: none;" to="/UserAdd"><el-menu-item  index="1-1">新增用户</el-menu-item></router-link>
+        </el-sub-menu>
+        <el-sub-menu index="3" height="100%">
+          <template #title>
+            <el-icon><location /></el-icon>
+            <span>设备报修</span>
+          </template>
+          <router-link style="  text-decoration: none;" to="/Equipment/EquipmentSubmit"><el-menu-item index="1-1">报修登记</el-menu-item></router-link>
+          <router-link style="  text-decoration: none;" to="/Equipment/EquipmentSearch"><el-menu-item index="1-1">报修记录</el-menu-item></router-link>
+        </el-sub-menu>
+        <el-sub-menu index="4" height="100%">
+          <template #title>
+            <el-icon><location /></el-icon>
+            <span>样机流转</span>
+          </template>
+          <router-link style="  text-decoration: none;" to="/ModelAdd"><el-menu-item index="1-1">新建样机</el-menu-item></router-link>
+          <router-link style="  text-decoration: none;" to="/ModelApply"><el-menu-item index="1-1">样机申请</el-menu-item></router-link>
         </el-sub-menu>
         <el-menu-item index="3">
           <el-icon><icon-menu /></el-icon>
@@ -53,3 +69,6 @@ const handleClose = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }
 </script>
+<style>
+
+</style>
