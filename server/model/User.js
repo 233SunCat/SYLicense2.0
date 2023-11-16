@@ -14,7 +14,7 @@ const UserSchema = Mongoose.Schema({
     default: ""
   },
 
-  nickName: {
+  nickName: {//昵称
     type: String,
     default: ""
   },
@@ -27,8 +27,20 @@ const UserSchema = Mongoose.Schema({
   permission: {
     type: Number,
     default: 0
+  },
+  wxID:{
+
+  },
+  applyDate:{//申请时间
+    type: Date,
+    default: null
+  },
+  applyStatus:{
+    type: String,
+    default: ""
   }
-});
+}
+);
 const User = Mongoose.model("User", UserSchema);
 module.exports = {
   User: User

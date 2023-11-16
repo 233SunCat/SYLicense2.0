@@ -26,32 +26,33 @@
             <el-icon><location /></el-icon>
             <span>发货信息</span>
           </template>
-          <router-link style="  text-decoration: none;" to="/UserAdd"><el-menu-item  index="1-1">新增用户</el-menu-item></router-link>
+          <router-link style="  text-decoration: none;" to="/UserAdd"><el-menu-item  index="2-1">新增用户</el-menu-item></router-link>
         </el-sub-menu>
         <el-sub-menu index="3" height="100%">
           <template #title>
             <el-icon><location /></el-icon>
             <span>设备报修</span>
           </template>
-          <router-link style="  text-decoration: none;" to="/Equipment/EquipmentSubmit"><el-menu-item index="1-1">报修登记</el-menu-item></router-link>
-          <router-link style="  text-decoration: none;" to="/Equipment/EquipmentSearch"><el-menu-item index="1-1">报修记录</el-menu-item></router-link>
+          <router-link style="  text-decoration: none;" to="/Equipment/EquipmentSubmit"><el-menu-item index="3-1">报修登记</el-menu-item></router-link>
+          <router-link style="  text-decoration: none;" to="/Equipment/EquipmentSearch"><el-menu-item index="3-2">报修记录</el-menu-item></router-link>
         </el-sub-menu>
         <el-sub-menu index="4" height="100%">
           <template #title>
             <el-icon><location /></el-icon>
             <span>样机流转</span>
           </template>
-          <router-link style="  text-decoration: none;" to="/ModelAdd"><el-menu-item index="1-1">新建样机</el-menu-item></router-link>
-          <router-link style="  text-decoration: none;" to="/ModelApply"><el-menu-item index="1-1">样机申请</el-menu-item></router-link>
+          <router-link style="  text-decoration: none;" to="/ModelAdd"><el-menu-item index="4-1">新建样机</el-menu-item></router-link>
+          <router-link style="  text-decoration: none;" to="/MTapply"><el-menu-item index="4-2">样机申请</el-menu-item></router-link>
+          <router-link style="  text-decoration: none;" to="/MTmessage"><el-menu-item index="4-3">样机流转信息</el-menu-item></router-link>
         </el-sub-menu>
-        <el-menu-item index="3">
-          <el-icon><icon-menu /></el-icon>
-          <span>发货信息</span>
-        </el-menu-item>
-        <el-menu-item index="4">
-          <el-icon><setting /></el-icon>
-          <span>Navigator Four</span>
-        </el-menu-item>
+        <el-sub-menu index="5" height="100%">
+          <template #title>
+            <el-icon><location /></el-icon>
+            <span>用户权限</span>
+          </template>
+          <router-link style="  text-decoration: none;" to="/PermissionsApply"><el-menu-item index="5-1">待开权限</el-menu-item></router-link>
+          <router-link style="  text-decoration: none;" to="/ModelApply"><el-menu-item index="5-2">审核权限</el-menu-item></router-link>
+        </el-sub-menu>
       </el-menu>
 </template>
 
