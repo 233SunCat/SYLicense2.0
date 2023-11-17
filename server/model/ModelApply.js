@@ -10,10 +10,18 @@ const ModelNamelist = Mongoose.Schema({
         default: ""
     },
     modelUsedFunction:{//样机使用用途
+        type: String,
+        default: ''
+    },
+    modelName:{//选择设备名称
+        type: String,
+        default: ''
+    },
+    modelModule:{//设备模块
         type: [String],
         default: ['']
     },
-    modelArrivelDate:{//期望样机到货时间
+    modelArrivelTime:{//期望样机到货时间
         type: Date,
         default: Date.now
     },
@@ -25,7 +33,7 @@ const ModelNamelist = Mongoose.Schema({
 );
   
   
-const Fault = Mongoose.model('modelnamelist', ModelNamelist,'modelnamelist');
+const Fault = Mongoose.model('modeapply', ModelNamelist,'modeapply');
 
 // console.log(Fault)
 // module.exports = Fault;
