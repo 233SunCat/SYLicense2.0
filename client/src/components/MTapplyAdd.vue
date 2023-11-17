@@ -36,8 +36,8 @@
                             </el-checkbox-group>
                         </el-form-item>
                         <el-form-item label="期望到货时间">
-                            <el-input style="width: 100%;" v-model="formInline.arrivalTime" placeholder="期望到货时间"
-                                clearable />
+                            <el-date-picker v-model="formInline.arrivalTime" type="datetime" placeholder="选择期望到货时间"
+                                :default-time="defaultTime" />
                         </el-form-item>
                         <el-form-item label="期望到货地址">
                             <el-input style="width: 100%;" v-model="formInline.arrivalLocation" placeholder="期望到货地址"
@@ -62,8 +62,11 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type { Action } from 'element-plus'
 import type { UploadInstance } from 'element-plus'
 import type { UploadProps, UploadUserFile } from 'element-plus'
-
+import dayjs from 'dayjs'
 //数据
+const defaultTime = new Date(2000, 1, 1, 12, 0, 0)
+const value3 = ref('')
+
 const labelPosition = ref<FormProps['labelPosition']>('right')
 const uploadRef = ref<UploadInstance>()
 var uploadData = new FormData()
@@ -114,13 +117,32 @@ const getModule = () => {//模块|用途|设备名称
 
 const eamilSubmit = () => {//发送请求
     formInline.value.checkedCities = checkedCities.value;
-    console.log(formInline)
+
+    const dayTime =  dayjs(formInline.value.arrivalTime).format("YYYY-MM-DD HH-mm-ss")
+
+    console.log(dayTime)
+    //     axios({
+    //       url: '/Model/ModelApply',
+    //       data: formInline,
+    //       method: 'post',
+    //       headers: {s
+    //           'Content-Type': 'application/x-www-form-urlencoded'
+    //       }
+    //   }).then(res => {
+    //       console.log(res)
+    //   })
 }
 </script>
   
 <style>
 .demo-form-inline .el-input {
     --el-input-width: 220px;
+}
+.demonstration {
+  display: block;
+  color: var(--el-text-color-secondary);
+  font-size: 14px;
+  margin-bottom: 20px;
 }
 </style>
   
