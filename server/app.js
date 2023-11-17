@@ -6,6 +6,8 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var equipmentRouter = require('./routes/equipment');
+var modelRouter = require('./routes/model');
+
 const MongodbInit = require("./controller/MongodbInit")
 
 MongodbInit();//链接数据库
@@ -22,6 +24,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/Equipment',equipmentRouter);
+app.use('/Model',modelRouter);
+
 
 app.all('*', function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')

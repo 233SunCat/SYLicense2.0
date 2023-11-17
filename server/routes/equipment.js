@@ -127,7 +127,6 @@ router.post('/EquipmentDetail',async(req, res) => {
     const { equipmentId } = req.body;  
     // 使用模型查询数据  
     const equipmentDetail = await Fault.find({ equipmentId }).exec();  
-  
     // 返回查询结果  
     res.json(equipmentDetail);  
   } catch (error) {  
