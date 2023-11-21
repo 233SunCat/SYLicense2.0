@@ -29,18 +29,18 @@
                         <el-form-item label="模块选择：">
                             <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate"
                                 @change="handleCheckAllChange">全选</el-checkbox>
-                            <el-checkbox-group v-model="modelModule" @change="handleCheckedCitiesChange">
+                            <el-checkbox-group v-model="formInline.modelModule" @change="handleCheckedCitiesChange">
                                 <el-checkbox v-for="city in cities" :key="city" :label="city">{{
                                     city
                                 }}</el-checkbox>
                             </el-checkbox-group>
                         </el-form-item>
                         <el-form-item label="期望到货时间">
-                            <el-date-picker v-model="formInline.modelArrivelTime" type="datetime" placeholder="选择期望到货时间"
+                            <el-date-picker v-model="formInline.modelArrivalTime" type="datetime" placeholder="选择期望到货时间"
                                 :default-time="defaultTime" />
                         </el-form-item>
                         <el-form-item label="期望到货地址">
-                            <el-input style="width: 100%;" v-model="formInline.modelArriveLocation" placeholder="期望到货地址"
+                            <el-input style="width: 100%;" v-model="formInline.modelArrivalLocation" placeholder="期望到货地址"
                                 clearable />
                         </el-form-item>
                         <el-form-item>
@@ -70,7 +70,6 @@ const value3 = ref('')
 const labelPosition = ref<FormProps['labelPosition']>('right')
 const uploadRef = ref<UploadInstance>()
 var uploadData = new FormData()
-var modelModule = ref(['实物训练', '基础技能训练'])
 var cities = ['实物训练', '基础技能训练', '缝合打结训练', '胆囊手术训练']
 var equipmentFunctions = ['招标前演示', '样机试用']
 var equipmentNames = ['力反馈腹腔镜', '虚实结合腹腔镜']
@@ -79,9 +78,11 @@ const formInline = ref({
     modelUsedName: '',
     modelUsedFunction: '',
     modelName: '',
-    modelArrivelTime: '',
-    modelArriveLocation: '',
-    modelModule: [''],
+    modelArrivalTime: '',
+    modelArrivalLocation: '',
+    modelModule: ['实物训练', '基础技能训练'],
+    modelApplyTime: new Date(),
+    modelApplyStatus:''
 
 })
 const checkAll = ref(false)
@@ -109,15 +110,16 @@ const handleChange: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
 //通信
 const getModule = () => {//模块|用途|设备名称
     //多选框
-    modelModule.value = ['实物训练', '基础技能训练']
     cities = ['实物训练', '基础技能训练', '缝合打结训练', '胆囊手术训练']
     equipmentFunctions = ['招标前演示', '样机试用']
     equipmentNames = ['力反馈腹腔镜', '虚实结合腹腔镜']
 }
 
 const eamilSubmit = () => {//发送请求
-    formInline.value.modelModule = modelModule.value;
-    console.log(formInline)
+
+    console.log(formInline.value)
+    console.log(formInline.value.modelModule)
+    formInline.value.modelApplyStatus = '待审核';
         axios({
           url: '/Model/ModelApply',
           data: formInline.value,

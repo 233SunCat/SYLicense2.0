@@ -27,6 +27,7 @@
             <span>发货信息</span>
           </template>
           <router-link style="  text-decoration: none;" to="/UserAdd"><el-menu-item  index="2-1">新增用户</el-menu-item></router-link>
+          <router-link style="  text-decoration: none;" to="/ShipMessage"><el-menu-item  index="2-1">发货信息</el-menu-item></router-link>
         </el-sub-menu>
         <el-sub-menu index="3" height="100%">
           <template #title>

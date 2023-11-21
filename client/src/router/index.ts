@@ -9,6 +9,7 @@ import EquipmentDetail from '../views/EquipmentDetail.vue'
 import PermissionsApply from '../views/PermissionsApply.vue'
 import MTmessage from '../views/MTmessage.vue'
 import MTapply from '../views/MTapply.vue'
+import ShipMessage from '../views/ShipMessage.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -61,6 +62,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'MTapply',
     component: MTapply
   },
+  {//发货信息
+    path: '/ShipMessage',
+    name: 'ShipMessage',
+    component: ShipMessage
+  }
 ]
 
 const router = createRouter({

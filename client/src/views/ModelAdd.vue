@@ -108,6 +108,10 @@ const nameGet = () => {//设备名称
       })
       return 
 }
+
+
+
+
 const onSubmit = () => {//提交
   status = 1;
   statusPack()

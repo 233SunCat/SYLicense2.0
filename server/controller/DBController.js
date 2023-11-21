@@ -59,6 +59,16 @@ async function getData(dbController,keyword,selectedOption) {//searchData[{}],st
     res.status(500).send('服务器错误');  
   }  
 }
+async function getDatacd(dbController) {//searchData[{}],startDate,endDate,selectedOption,keyword
 
+  try {  
+    const resDate = await dbController.find().exec();  
+    //res.json(equipmentDetail); // 将结果以JSON格式返回给客户端 
+    return resDate;
+  } catch (error) {  
+    console.error('检索设备详情时出错：', error);  
+    res.status(500).send('服务器错误');  
+  }  
+}
 
-module.exports = { CreateInsert, Update,getData, Delete};
+module.exports = { CreateInsert, Update,getData, Delete, getDatacd};

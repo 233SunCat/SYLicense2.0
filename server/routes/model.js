@@ -20,7 +20,7 @@ router.post('/ModelAdd', async function (req, res, next) {
 
     // 确保已经连接到数据库  
     //dbController.CreateInsert(Fault, {modelName:'虚实结合腹腔镜',modelStyle:'BBQ'});
-    const resDate =  await dbController.CreateInsert(Fault, req.data);
+    const resDate =  await dbController.CreateInsert(Fault, req.body);
     res.send('resDate')
 });
 router.post('/ModelApply', async function (req, res, next) {

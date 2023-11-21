@@ -7,6 +7,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var equipmentRouter = require('./routes/equipment');
 var modelRouter = require('./routes/model');
+var shipRouter = require('./routes/ShipClient');
 
 const MongodbInit = require("./controller/MongodbInit")
 
@@ -25,7 +26,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/Equipment',equipmentRouter);
 app.use('/Model',modelRouter);
-
+app.use('/ShipClient',shipRouter);
 
 app.all('*', function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
