@@ -10,7 +10,7 @@
             <div class="grid-content ep-bg-purple" /> <el-form class="demo-form-inline" :label-position="labelPosition"
               label-width="120px" style="max-width: 460px;width: 60%;">
               <el-form-item>
-                <el-button plain @click="EquipmentAdd">
+                <el-button plain @click="EquipmentAdd" :disabled="netDisabled">
                   <el-icon size="large">
                     <CirclePlus />
                   </el-icon>
@@ -18,7 +18,7 @@
                 <el-form-item>
                   <el-row :gutter="30">
                     <el-col :span="12" v-for="item in formInline.equipmentNames" :key="item">
-                      <el-button type="info" @click="dataSearch">{{ item }}</el-button>
+                      <el-button type="info" @click="HandleFormSearch(item)">{{ item }}</el-button>
                     </el-col>
                   </el-row>
                 </el-form-item>
@@ -50,14 +50,14 @@
               </el-form-item>
               <el-form-item label="设备数量/台：">
                 <el-input style="width: 100%;" v-model="formInline.equipmentNumber" placeholder="设备数量" clearable
-                  @input="InputChange(formInline.equipmentNumber)" />
+                  @input="InputChange(formInline.equipmentNumber)" :disabled="netDisabled" />
               </el-form-item>
               <el-form-item label="设备编号：" v-for="item in formInline.equipmentIds" :key="item.id">
-                <el-input style="width: 100%;" v-model="item.str" :key="item.id" clearable />
+                <el-input style="width: 100%;" v-model="item.str" :key="item.id" clearable :disabled="netDisabled"/>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="onSubmit">确认保存</el-button>
-                <el-button type="primary">取消</el-button>
+                <el-button type="primary" @click="onSubmit" :disabled="netDisabled">确认保存</el-button>
+                <el-button type="primary" :disabled="netDisabled">取消</el-button>
               </el-form-item>
             </el-form>
           </el-col>
@@ -86,6 +86,8 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import ConfigureTrainingApply from './ConfigureTrainingApply.vue'
 import EventBus from "../assets/common/event-bus"
 import axiosServer from '../assets/common/axios-server.js'
+import qs from 'qs'; // 引入 qs 库
+
 const input = ref('')
 var dialogFormVisible = ref(false)
 var dialogEqAdd = ref(false)
@@ -95,10 +97,10 @@ var equipmentIds = ref()
 const labelPosition = ref<FormProps['labelPosition']>('right')
 
 interface FormInlineData {
-  equipmentNames: string[];
+  equipmentNames: { equipmentName: number, equipmentNumber: string }[];
   equipmentStyle: string;
   equipmentNumber: string;
-  equipmentIds:  {id: number, str: string}[];
+  equipmentIds: { id: number, str: string }[];
   equipmentName: string;
   equipmentModule: string[],
   clientName: string,
@@ -109,23 +111,14 @@ const formInline = reactive({//这里就是获取的数据
   equipmentNames: [],
   equipmentStyle: '',
   equipmentNumber: '',
-  equipmentIds: [{id:0,str:''}],
+  equipmentIds: [],
   equipmentName: '',
   equipmentModule: [],
-  clientName:'',
-  orderDate:'',
-  orderStatus:''
+  clientName: '',
+  orderDate: '',
+  orderStatus: ''
 })
-var newformInline = reactive({//这里就是获取的数据
-  equipmentStyle: '',
-  equipmentNumber: '',
-  equipmentIdss: [],
-  equipmentName: '',
-  equipmentModule: [],
-  clientName:'',
-  orderDate:'',
-  orderStatus:''
-})
+
 const items = ref(['实物训练', '基础技能训练'])
 const activities = [
   {
@@ -150,27 +143,23 @@ const isIndeterminate = ref(true)
 const checkedCities = ref([])
 const cities = ['镜头训练', '分离训练', 'FLS技能训练', '剪切训练', '钛夹训练', '电凝训练', '双手合作训练', '抓取训练']
 const ClientName = ref('')
+interface FormData {
+  // 其他字段...
+  items: { clientName: string; /* 其他字段... */ }[];
+}
 
-EventBus.on('slide-ship', (val: any) => {
-  ClientName.value = val
-  //formInline.equipmentNames = GetEquipmentName()
-  console.log(val)
-  formInline.clientName = val.clientName
-  formInline.orderDate = val.orderDate
-  formInline.orderStatus = val.orderStatus
-})
+
+
+//通信-添加
 const InputNumArry = (num) => {//数字转数组
   // 确定字典数组的长度  
   const length = num;
-
   // 创建一个字典数组  
   const dictArray: { id: number, str: string }[] = [];
-
   // 使用循环来填充字典数组  
   for (let i = 1; i <= length; i++) {
     dictArray.push({ id: i, str: '' });
   }
-
   return dictArray
 }
 const InputChange = (num: any) => {//输入框触发
@@ -205,35 +194,126 @@ const EquipmentSelect = (name: any) => {//下拉框选择设备
   dialogEqAdd.value = false
   formInline.equipmentName = name;
   formInline.equipmentNames.push(name)
-  NetDisable()
 }
-const NetDisable = () => {//禁止输入
-  netDisabled.value = false;
-}
+
 const SaveFault = () => {//保存失败弹框
   ElMessageBox.alert('保存失败', '提示：', {
     confirmButtonText: '确认',
   })
 }
 
-//通信-添加
+
 const onSubmit = () => {//保存数据
-  console.log()
+  console.log(formInline)
   //发送请求
-  //axiosServer.AxiosPost(formInline, '/ShipClient/AddEquipment')
+  axiosServer.AxiosPost(qs.stringify(formInline), '/ShipClient/AddEquipment')
   //保存成功会加弹框，重新加载设备信息页，同时禁止输入
   //判断如果是禁止输入状态则弹框保存失败
-
 }
-//通信-查看
-const GetEquipmentName = () => {//数据库获得某个医院现有的所有设备名称
-  return ['123', '456']
+//查看数据
+// 定义设备信息的接口
+interface EquipmentInfo {
+  equipmentName: string;
+  equipmentNumber: number;
 }
-const GetEquipment = () => {
-  return { equipmentStyle: '456789', equipmentNumber: '123', equipmentIds: [{id:1,str:''}], module: ['镜头训练', '剪切训练'] }
+interface EquipmentInfo {
+  equipmentName: string;
+  equipmentModule: string[];
+  equipmentStyle: string;
+  equipmentIds: string[];
+  str: string[];
+  equipmentNumber: number;
+}
+const processEquipmentData = (data: Record<string, any>[]): EquipmentInfo[] => {
+  const equipmentInfoMap: Record<string, EquipmentInfo> = {};
+
+  // 遍历原始数据数组
+  data.forEach(item => {
+    const key = `${item.equipmentName}-${item.equipmentModule.join('-')}-${item.equipmentStyle}`;
+
+    // 检查是否已经存在于 equipmentInfoMap 中
+    if (equipmentInfoMap[key]) {
+      equipmentInfoMap[key].equipmentIds.push(item.equipmentId);
+      equipmentInfoMap[key].str.push(item.equipmentId);
+      equipmentInfoMap[key].equipmentNumber++;
+    } else {
+      equipmentInfoMap[key] = {
+        ...item,
+        equipmentIds: [item.equipmentId],
+        str: [item.equipmentId],
+
+        equipmentNumber: 1,
+      };
+    }
+  });
+
+  // 将结果转换为数组形式
+  const equipmentInfoArray: EquipmentInfo[] = Object.values(equipmentInfoMap);
+
+  return equipmentInfoArray;
+};
+const processEquipmentButton = (result) => {//生成动态按钮
+  // 处理设备名称数组，得到设备信息数组
+  const data = processEquipmentData(result);
+  console.log('data: ',data)
+  // 打印结果
+  formInline.equipmentNames = data
 }
 
+//设备按钮
+const HandleFormSearch = (item) => {//内存表单查询
+  formInline.equipmentIds = []
+  console.log('item: ',item)
+  formInline.equipmentNumber = item.equipmentNumber
+  formInline.equipmentStyle = item.equipmentStyle
+  formInline.equipmentModule = item.equipmentModule
+  item.str.forEach((res,index) => {
+    formInline.equipmentIds.push({id:index,str:res})
+  })
+  console.log('equipmentIds',formInline.equipmentIds)
+}
 
+//直接加载
+EventBus.on('slide-ship', async (val: any) => {
+  console.log('val',val)
+  formInline.clientName = val.clientName
+  formInline.orderDate = val.orderDate
+  formInline.orderStatus = val.orderStatus
+  if(val.shipEquipmentId == ''){
+    NotNetDisable()
+    return 
+  }
+  ClientName.value = val
+  const shipEquipmentId = val.shipEquipmentId.split(',')
+  const result = await GetEquipmentByIds(shipEquipmentId)
+  const data = result.map(item => ({equipmentName:item.equipmentName, equipmentModule:item.equipmentModule,equipmentStyle:item.equipmentStyle, equipmentId:item.equipmentId}))
+  processEquipmentButton(data)
+
+  NetDisablePre(shipEquipmentId)
+})
+
+const GetEquipmentByIds = async (shipEquipmentId) => {//组件-数据库获得表单
+  try {
+    const res = await axiosServer.AxiosPost(qs.stringify(shipEquipmentId), '/ShipClient/GetEquipmentByIds');
+    return res;
+  } catch (error) {
+    console.error('GetEquipmentByIds error:', error);
+    throw error; 
+  }
+};
+const NetDisablePre = (shipEquipmentId) => {//组件-参数数组，判断长度是否为0
+  if(shipEquipmentId.length != 0){
+    NetDisable()
+  }else{
+    NotNetDisable()
+  }
+}
+const NetDisable = () => {//组件-禁止输入
+  netDisabled.value = true;
+}
+const NotNetDisable = () => {//组件-y允许输入
+  netDisabled.value = false;
+}
 </script>
   
 <style lang="less">

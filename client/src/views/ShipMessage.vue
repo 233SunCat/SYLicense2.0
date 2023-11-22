@@ -30,9 +30,10 @@
   import ShipEvent from '@/components/ShipEvent.vue'
 
   import axios from 'axios'
-  import {ref,provide,onMounted} from 'vue'
+  import {ref,provide,onMounted, reactive} from 'vue'
   import EventBus from "../assets/common/event-bus"
-  
+  import axiosServer from '../assets/common/axios-server.js'
+
   
   const prototypeName = "123456"
   const prototype = "123456"
@@ -40,7 +41,6 @@
   const manufactureDate = "123456"
   const location = "123456"
   const destination = ""//目的地
-  
   
   //样机流转信息
   const PrototypeWork = () => {

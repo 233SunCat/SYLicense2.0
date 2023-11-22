@@ -32,6 +32,14 @@ const ShipClient = Mongoose.Schema({
     type: [String],
     default: ['']
   },
+  equipmentNetwork:{//是否联网
+    type: String,
+    default: ""
+  },
+  protectTime:{//质保期
+    type: String,
+    default: ""
+  },
   ReceivingName:{//收货人姓名
     type: String,
     default: ""

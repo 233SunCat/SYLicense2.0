@@ -16,19 +16,13 @@
             </el-checkbox-group>
           </el-form-item>
           <el-form-item label="联网设备台数">
-            <el-select style="width: 100%;" v-model="formInline.networdkEqNumber" placeholder="选择设备数量" clearable>
-              <el-option v-for="item in items" :key="item" :label="item" :value="item" />
-            </el-select> </el-form-item>
+                <el-input style="width: 100%;" v-model="formInline.networdkEqNumber" placeholder="选择联网设备数量" clearable
+            @input="InputChange(formInline.networdkEqNumber)"/>
+            </el-form-item>
           <el-form-item label="联网设备编号">
             <el-row :gutter="5" style="width: 100%">
-              <el-col :span="8">
-                <el-input style="width: 100%" v-model="formInline.networkOne" clearable />
-              </el-col>
-              <el-col :span="8">
-                <el-input style="width: 100%" v-model="formInline.networkTwo" clearable />
-              </el-col>
-              <el-col :span="8">
-                <el-input style="width: 100%" v-model="formInline.networkThree" clearable />
+              <el-col :span="8" v-for="item in formInline.equipmentIds" :key="item.id">
+                <el-input style="width: 100%" v-model="item.str" clearable />
               </el-col>
             </el-row>
           </el-form-item>
@@ -67,21 +61,26 @@ import type { FormProps } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import dayjs from 'dayjs'
 import { fi } from 'element-plus/es/locale';
+import axiosServer from '../assets/common/axios-server.js'
+import qs from 'qs'; // 引入 qs 库
+
 //数据
 const time = ref('')
 const labelPosition = ref<FormProps['labelPosition']>('right')
-const formInline = reactive({//这里就是获取的数据
-  networdkEqNumber: 5,
-  networkOne: '',
-  networkTwo: '',
-  networkThree: '',
-  protectTime: ''
+interface FormInlineData {
+  networdkEqNumber: number;
+  equipmentIds:  {id: number, str: string}[];
+  protectTime: number;
+}
+const formInline = reactive<FormInlineData>({//这里就是获取的数据
+  networdkEqNumber: 0,
+  equipmentIds:  [],
+  protectTime: 0
 })
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
 var checkedCities = ref(['是'])
 var cities = ['是', '否']
-var items = ref([1, 2, 3, 4, 5, 6]);
 var status = 1;
 //事件
 const handleCheckedCitiesChange = (value: string[]) => {
@@ -98,7 +97,26 @@ const change = () => {//判断是否在库
     return;
   }
 }
+const InputNumArry = (num) => {//数字转数组
+  // 确定字典数组的长度  
+  const length = num;
 
+  // 创建一个字典数组  
+  const dictArray: { id: number, str: string }[] = [];
+
+  // 使用循环来填充字典数组  
+  for (let i = 1; i <= length; i++) {
+    dictArray.push({ id: i, str: '' });
+  }
+
+  return dictArray
+}
+const InputChange = (num: any) => {//输入框触发
+  //equipmentIds = num
+  //equipmentIds.value = InputNumArry(num)
+  formInline.equipmentIds = InputNumArry(num)
+  //console.log(InputNumArry(num))
+}
 const datePack = () => {//打包数据
   formInline.checkStatus = checkedCities.value[0];
 }
@@ -163,7 +181,8 @@ const onSubmit = () => {//提交
   if (status == 0) {
     return;
   }
-  console.log('数据格式：', formInline)
+  console.log(formInline)
+  axiosServer.AxiosPost(qs.stringify(formInline), '/ShipClient/AddNetwork')
   return;
 }
 </script>

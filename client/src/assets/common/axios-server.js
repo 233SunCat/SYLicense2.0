@@ -1,12 +1,12 @@
 
 import axios from "axios";
-const qs = require('qs');  
+const qs = require('qs');
 
-const paramsSerializer = (params) => {  
-    return qs.stringify(params, { arrayFormat: 'brackets' })  
-  };  
-const AxiosPost = (data,path) => {
-    axios({
+const paramsSerializer = (params) => {
+    return qs.stringify(params, { arrayFormat: 'brackets' })
+};
+const AxiosPost = (data, path) => {
+    return axios({
         url: path,
         data: data,
         method: 'post',
@@ -14,17 +14,23 @@ const AxiosPost = (data,path) => {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
     }).then(res => {
-        console.log(res.data)
-        return res.data
-    })
-}
+        console.log(res.data);
+        return res.data;
+    }).catch(error => {
+        console.error('AxiosPost error:', error);
+        throw error; // 抛出错误，以便调用方能够捕获
+    });
+};
+
+
+
 
 const AxiosGet = async (path) => {
     var data;
-    await axios.get(path).then(res=>{
+    await axios.get(path).then(res => {
         //console.log(res.data)
         data = res.data
     })
     return data
 }
-export default  {AxiosPost, AxiosGet}
+export default { AxiosPost, AxiosGet }

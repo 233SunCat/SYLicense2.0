@@ -10,12 +10,14 @@ var modelRouter = require('./routes/model');
 var shipRouter = require('./routes/ShipClient');
 
 const MongodbInit = require("./controller/MongodbInit")
+const bodyParser = require('body-parser');
 
 MongodbInit();//链接数据库
 
 
 var app = express();
 app.use(express.static('./uploads'))
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
