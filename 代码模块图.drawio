@@ -1,57 +1,23 @@
-<mxfile host="app.diagrams.net" modified="2023-11-24T09:56:48.523Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36" etag="XRk9ifgXHeUFgxyIuRDi" version="22.1.3" type="github">
+<mxfile host="app.diagrams.net" modified="2023-11-24T10:11:06.265Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36" etag="XnGezRUdcyJpj3d5v7y0" version="22.1.3" type="github">
   <diagram name="Page-1" id="9f46799a-70d6-7492-0946-bef42562c5a5">
     <mxGraphModel dx="2534" dy="789" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="zKdDq2GKEJ2XVdY2i587-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="110" y="260" as="targetPoint" />
-            <mxPoint x="110" y="250" as="sourcePoint" />
-          </mxGeometry>
+        <mxCell id="zKdDq2GKEJ2XVdY2i587-24" value="登录" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="20" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="zKdDq2GKEJ2XVdY2i587-5" value="登录" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="170" y="40" width="120" height="60" as="geometry" />
+        <mxCell id="zKdDq2GKEJ2XVdY2i587-26" value="post(&#39;/)&lt;br&gt;req:&amp;nbsp; res：&lt;br&gt;密码匹配" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="90" y="300" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="zKdDq2GKEJ2XVdY2i587-8" value="Classname" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
-          <mxGeometry x="290" y="170" width="160" height="86" as="geometry" />
+        <mxCell id="zKdDq2GKEJ2XVdY2i587-28" value="routers/Login.js" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" vertex="1" parent="1">
+          <mxGeometry x="-80" y="140" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="zKdDq2GKEJ2XVdY2i587-9" value="+ field: type" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="zKdDq2GKEJ2XVdY2i587-8">
-          <mxGeometry y="26" width="160" height="26" as="geometry" />
+        <mxCell id="zKdDq2GKEJ2XVdY2i587-29" value="HandleLoginButton&lt;br&gt;点击按钮触发，通信服务端" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="-190" y="290" width="170" height="100" as="geometry" />
         </mxCell>
-        <mxCell id="zKdDq2GKEJ2XVdY2i587-10" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="zKdDq2GKEJ2XVdY2i587-8">
-          <mxGeometry y="52" width="160" height="8" as="geometry" />
-        </mxCell>
-        <mxCell id="zKdDq2GKEJ2XVdY2i587-11" value="+ method(type): type" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="zKdDq2GKEJ2XVdY2i587-8">
-          <mxGeometry y="60" width="160" height="26" as="geometry" />
-        </mxCell>
-        <mxCell id="zKdDq2GKEJ2XVdY2i587-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="zKdDq2GKEJ2XVdY2i587-12">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="110" y="250" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="zKdDq2GKEJ2XVdY2i587-12" value="&lt;div style=&quot;color: rgb(212, 212, 212); background-color: rgb(30, 30, 30); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-weight: normal; font-size: 14px; line-height: 19px;&quot;&gt;&lt;div style=&quot;line-height: 19px;&quot;&gt;&lt;div style=&quot;line-height: 19px;&quot;&gt;HanleLoginResult&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="-120" y="450" width="230" height="60" as="geometry">
-            <mxRectangle x="40" y="190" width="110" height="30" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="zKdDq2GKEJ2XVdY2i587-13" value="&lt;div style=&quot;color: rgb(212, 212, 212); background-color: rgb(30, 30, 30); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;res: &lt;span style=&quot;color: #4ec9b0;&quot;&gt;any //字符串，判断成功，失败&lt;/span&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="zKdDq2GKEJ2XVdY2i587-12">
-          <mxGeometry y="26" width="230" height="26" as="geometry" />
-        </mxCell>
-        <mxCell id="zKdDq2GKEJ2XVdY2i587-14" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="zKdDq2GKEJ2XVdY2i587-12">
-          <mxGeometry y="52" width="230" height="8" as="geometry" />
-        </mxCell>
-        <mxCell id="zKdDq2GKEJ2XVdY2i587-19" value="Classname" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="30" y="170" width="160" height="86" as="geometry" />
-        </mxCell>
-        <mxCell id="zKdDq2GKEJ2XVdY2i587-20" value="+ field: type" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="zKdDq2GKEJ2XVdY2i587-19">
-          <mxGeometry y="26" width="160" height="26" as="geometry" />
-        </mxCell>
-        <mxCell id="zKdDq2GKEJ2XVdY2i587-21" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="zKdDq2GKEJ2XVdY2i587-19">
-          <mxGeometry y="52" width="160" height="8" as="geometry" />
-        </mxCell>
-        <mxCell id="zKdDq2GKEJ2XVdY2i587-22" value="点击按钮触发，通信服务端" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="zKdDq2GKEJ2XVdY2i587-19">
-          <mxGeometry y="60" width="160" height="26" as="geometry" />
+        <mxCell id="zKdDq2GKEJ2XVdY2i587-30" value="HandleLoginResult&lt;br&gt;res: req:&lt;br&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="-400" y="230" width="190" height="100" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
