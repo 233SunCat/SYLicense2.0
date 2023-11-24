@@ -43,11 +43,9 @@ interface Item {
   orderDate: string;
   __v: number;
 }
-const handleOpen = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
+const handleOpen = (key: string, keyPath: string[]) => {//
 }
-const handleClose = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
+const handleClose = (key: string, keyPath: string[]) => {//
 }
 
 //get axios data
@@ -60,18 +58,12 @@ const handleClose = (key: string, keyPath: string[]) => {
 //         console.error(error)
 //     })
 const shuzu = reactive({ title: '123' })
-const handleMenuItemClick = (menuItem: any) => {
-  //emit('add', shuzu)
-  // 这里处理菜单项的点击事件  
-  console.log("点击了菜单项：", menuItem);
-  EventBus.emit("slide-ship", { clientName: menuItem.clientName, orderDate: menuItem.orderDate, shipEquipmentId: menuItem.equipmentId ,orderStatus:menuItem.orderStatus});
-}
+
 
 
 //通信-page-slide
 onMounted(() => {
-  const handleMessage = (message: string) => {
-    console.log('加载输出数据', message)
+  const handleMessage = (message: string) => {//
 
   };
   //EventBus.on('message', handleMessage); 
@@ -100,7 +92,7 @@ const fenlei = (data) => {
 
     items.forEach((item) => {
       const year = item.orderDate;
-      const itemKey = `${item.clientName}-${year}`;
+      const itemKey = `${item.clientName}+${year}`;
 
       if (mergedItems[itemKey]) {
         mergedItems[itemKey].push(item.equipmentId);
@@ -110,7 +102,7 @@ const fenlei = (data) => {
     });
 
     return Object.entries(mergedItems).map(([key, equipmentIds]) => {
-      const [clientName, year] = key.split("-");
+      const [clientName, year] = key.split("+");
       return { clientName, orderDate: year, equipmentId: equipmentIds.join(", ") };
     });
   };
@@ -121,14 +113,10 @@ const fenlei = (data) => {
     items: mergeItems(entry.items),
   }));
 
-  console.log(JSON.stringify(mergedData, null, 2));
 
 
-  console.log(mergedData)
   return mergedData
 }
-
-//侧边栏加载
 const YearMonTurn = (collection) => {
   // 处理后的数组，以年月为分组标准  
   let groupedCollection: Group[] = [];
@@ -162,18 +150,26 @@ const YearMonTurn = (collection) => {
   }
   return groupedCollection
 }
+/**
+ * 加载侧边栏
+ */
 const ShipMenuSlide = () => {//返回时间，用户
-  axiosServer.AxiosGet('/ShipClient').then(collection => {
-    const data = YearMonTurn(collection)
-    console.log('fenlei',data)
-    menus.value = fenlei(data)
-
+  axiosServer.AxiosGet('/ShipClient/ShipMenu').then(collection => {
+    console.log('collection',collection)
+    menus.value = fenlei(YearMonTurn(collection))
   })
-  //const data = [{id:1 ,name:'2023年9月',children:[{id:1,name:'大同市第三人民医院',status:'待发'},{id:2,name:'苏北人民医院',status:'待发'}]},{id:2,name:'2023年08月'},{id:3,name:'2023年07月'}]
-  //return data
 }
-//添加设备
-//menus.value = ShipMenuSlide()
 ShipMenuSlide()
+
+/**
+ * 侧边栏触发事件
+ * @param menuItem  
+ */
+const handleMenuItemClick = (menuItem: any) => {
+  //emit('add', shuzu)
+  // 这里处理菜单项的点击事件  
+  console.log("点击了菜单项：", menuItem.orderStatus);
+  EventBus.emit("slide-ship", { clientName: menuItem.clientName, orderDate: menuItem.orderDate, equipmentIds: menuItem.equipmentId ,orderStatus:'已中标'});
+}
 </script>
   

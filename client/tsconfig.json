@@ -34,7 +34,7 @@
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx"
-  ],
+, "src/assets/common/axios-server.js"  ],
   "exclude": [
     "node_modules"
   ]

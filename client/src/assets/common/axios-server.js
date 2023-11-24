@@ -14,10 +14,8 @@ const AxiosPost = (data, path) => {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
     }).then(res => {
-        console.log(res.data);
         return res.data;
     }).catch(error => {
-        console.error('AxiosPost error:', error);
         throw error; // 抛出错误，以便调用方能够捕获
     });
 };

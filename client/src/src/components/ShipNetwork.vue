@@ -21,8 +21,8 @@
             </el-form-item>
           <el-form-item label="联网设备编号">
             <el-row :gutter="5" style="width: 100%">
-              <el-col :span="8" v-for="item ,index in formInline.equipmentIds" :key="index">
-                <el-input style="width: 100%" v-model="formInline.equipmentIds[index]" clearable />
+              <el-col :span="8" v-for="item in formInline.equipmentIds" :key="item.id">
+                <el-input style="width: 100%" v-model="item.str" clearable />
               </el-col>
             </el-row>
           </el-form-item>
@@ -44,7 +44,7 @@
           </el-form-item>
 
           <el-form-item>
-            <el-button type="primary" @click="NetworkUpdate">确认</el-button>
+            <el-button type="primary" @click="onSubmit">确认</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -63,14 +63,13 @@ import dayjs from 'dayjs'
 import { fi } from 'element-plus/es/locale';
 import axiosServer from '../assets/common/axios-server.js'
 import qs from 'qs'; // 引入 qs 库
-import EventBus from "../assets/common/event-bus"
 
 //数据
 const time = ref('')
 const labelPosition = ref<FormProps['labelPosition']>('right')
 interface FormInlineData {
   networdkEqNumber: number;
-  equipmentIds:  string[];
+  equipmentIds:  {id: number, str: string}[];
   protectTime: number;
 }
 const formInline = reactive<FormInlineData>({//这里就是获取的数据
@@ -98,9 +97,25 @@ const change = () => {//判断是否在库
     return;
   }
 }
+const InputNumArry = (num) => {//数字转数组
+  // 确定字典数组的长度  
+  const length = num;
 
+  // 创建一个字典数组  
+  const dictArray: { id: number, str: string }[] = [];
+
+  // 使用循环来填充字典数组  
+  for (let i = 1; i <= length; i++) {
+    dictArray.push({ id: i, str: '' });
+  }
+
+  return dictArray
+}
 const InputChange = (num: any) => {//输入框触发
-  formInline.equipmentIds = Array.from({ length: num }, () => "");
+  //equipmentIds = num
+  //equipmentIds.value = InputNumArry(num)
+  formInline.equipmentIds = InputNumArry(num)
+  //console.log(InputNumArry(num))
 }
 const datePack = () => {//打包数据
   formInline.checkStatus = checkedCities.value[0];
@@ -155,79 +170,21 @@ const PeriodInput = () => {
 //通信区域
 //接受请求
 
+//发送请求
 const GetEqStart = () => {//获得机器在库开始时间
   return '2023-8-8'
 }
 
-
-
-/**
- * 增
- */
-const NetworkUpdate= () => {//提交
+const onSubmit = () => {//提交
   status = 1;
   statusPack()
   if (status == 0) {
     return;
   }
   console.log(formInline)
-  axiosServer.AxiosPost(qs.stringify(formInline), '/ShipClient/UpdateNetwork')
+  axiosServer.AxiosPost(qs.stringify(formInline), '/ShipClient/AddNetwork')
   return;
 }
-const formMap = (result) => {
-    return result.map(item => ({equipmentName:item.equipmentName, equipmentModule:item.equipmentModule,equipmentStyle:item.equipmentStyle, equipmentId:item.equipmentId}))
-}
-const GetEquipmentByIds = async (val) => {//组件-数据库获得表单
-  try {
-     const equipmentIds = val.equipmentIds.split(',')
-    const res = await axiosServer.AxiosPost(qs.stringify(equipmentIds), '/ShipClient/GetEquipmentByIds');
-    return res;
-  } catch (error) {
-    console.error('GetEquipmentByIds error:', error);
-    throw error; 
-  }
-};
-const processEquipmentData = (data: Record<string, any>[]): EquipmentInfo[] => {
-  const equipmentInfoMap: Record<string, EquipmentInfo> = {};
-
-  // 遍历原始数据数组
-  data.forEach(item => {
-    const key = `${item.equipmentName}-${item.equipmentModule.join('-')}-${item.equipmentStyle}`;
-
-    // 检查是否已经存在于 equipmentInfoMap 中
-    if (equipmentInfoMap[key]) {
-      equipmentInfoMap[key].equipmentIds.push(item.equipmentId);
-      equipmentInfoMap[key].str.push(item.equipmentId);
-      equipmentInfoMap[key].equipmentNumber++;
-    } else {
-      equipmentInfoMap[key] = {
-        ...item,
-        equipmentIds: [item.equipmentId],
-        str: [item.equipmentId],
-
-        equipmentNumber: 1,
-      };
-    }
-  });
-
-  // 将结果转换为数组形式
-  const equipmentInfoArray: EquipmentInfo[] = Object.values(equipmentInfoMap);
-
-  return equipmentInfoArray;
-};
-EventBus.on('slide-ship', async (val: any) => {
-  console.log('订单=联网', val)
-  const result = await GetEquipmentByIds(val)
-  const data = formMap(result)
-  const formData =  processEquipmentData(data)
-  formData.forEach((item,i)=>{
-    item.equipmentIds.forEach((res,index) => {
-    formInline.equipmentIds.push(res)
-    })
-})
-  formInline.networdkEqNumber = formInline.equipmentIds.length
-
-})
 </script>
   
 <style>

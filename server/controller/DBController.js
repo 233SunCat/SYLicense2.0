@@ -20,7 +20,7 @@ function Update(dbController, updatedId, updatedDate) {
             res.status(500).send('db updating fault'); // 发送500错误响应  
         });
 }
-function UpdateNetwork(dbController, updatedId, updatedData) {
+function UpdateNetwork(dbController, updatedId, updatedDate, ) {
   dbController.updateOne({ equipmentId: updatedId }, { $set: { equipmentNetwork: 1 ,protectTime: updatedData.protectTime } })
     .then(() => {
       console.log('Database updated successfully');
@@ -29,20 +29,6 @@ function UpdateNetwork(dbController, updatedId, updatedData) {
       console.error('Database update error:', error);
     });
 }
-function GetEquipmentByIds(dbController, equipmentIds) {
-  // 返回 Promise 对象，该对象在查询完成后将解析为查询结果
-  return dbController.find({ equipmentId: { $in: equipmentIds } })
-    .then((results) => {
-      // 返回查询结果
-      return results;
-    })
-    .catch((error) => {
-      // 返回错误信息
-      throw error;
-    });
-}
-
-
 
 //多条删除|条件多
 function Delete(dbController, deleteId) {
@@ -53,10 +39,41 @@ function Delete(dbController, deleteId) {
         });
 
 }
-
+/**
+ * 条件：多字段单数据，修改：多字段单数据
+ * @param {A:1,B:2..} query 
+ * @param {C:1,D:2..} update 
+ */
+async function UpdateCollectionsByCollections(query, update) {
+  try {
+    const result = await YourModel.updateMany(query, update);
+    //console.log('Update result:', result);
+  } catch (error) {
+    //console.error('Error in updateDocuments:', error);
+    throw error;
+  }
+}
+/**
+ * 
+ * @param {*} query 
+ */
+// 使用示例
+// const query = {
+//   equipmentId: 'yourEquipmentId', // 替换为你的具体 equipmentId
+//   orderDate: new Date('yourOrderDate'), // 替换为你的具体 orderDate
+// };
+async function GetCollectionsByCollections(dbController,query) {
+  try {
+    const result = await dbController.find(query);
+    return result
+  } catch (error) {
+    console.error('Error in findDocuments:', error);
+    throw error;
+  }
+}
 
 //多条查询|条件
-async function getData(dbController,keyword,selectedOption) {//searchData[{}],startDate,endDate,selectedOption,keyword
+async function GetCollectionsByCondition(dbController,keyword,selectedOption) {//searchData[{}],startDate,endDate,selectedOption,keyword
   // 创建查询条件
   const query = {  
     // faultDate: {  
@@ -83,7 +100,33 @@ async function getData(dbController,keyword,selectedOption) {//searchData[{}],st
     res.status(500).send('服务器错误');  
   }  
 }
-async function getDatacd(dbController) {//searchData[{}],startDate,endDate,selectedOption,keyword
+/**
+ * 根绝某个字段的数组，返货多个集合
+ * @param {*数据库模型} dbController 
+ * @param {*某字段名} propertyName 
+ * @param {*某字段数据数组} propertysData 
+
+ * @returns 
+ */
+async function GetDataByfieldNameAndfieldValues(dbController, fieldName, fieldValues) {
+  try {
+    if (!fieldName || !fieldValues || !Array.isArray(fieldValues) || fieldValues.length === 0) {
+      throw new Error('Field name and a non-empty array of field values are required.');
+    }
+
+    const queryConditions = {
+      [fieldName]: { $in: fieldValues },
+    };
+
+    const result = await dbController.find(queryConditions);
+    return result;
+  } catch (error) {
+    console.error('Error in getDataByField:', error);
+    throw error;
+  }
+}
+
+async function GetCollections(dbController) {//searchData[{}],startDate,endDate,selectedOption,keyword
 
   try {  
     const resDate = await dbController.find().exec();  
@@ -94,41 +137,6 @@ async function getDatacd(dbController) {//searchData[{}],startDate,endDate,selec
     res.status(500).send('服务器错误');  
   }  
 }
-async function getDataSlideShip(dbController) {
-  try {
-    const resDate = await dbController.find().exec();
-    
-    // 提取特定字段并构建新的结果数组
-    const extractedData = resDate.map(item => ({
-      clientName: item.clientName,
-      orderDate: item.orderDate,
-      equipmentId: item.equipmentId,
-      orderStatus: item.orderStatus
-    }));
 
-    return extractedData;
-  } catch (error) {
-    console.error('检索设备详情时出错：', error);
-    // 在这里你可以决定如何处理错误，例如返回适当的错误响应
-    throw new Error('服务器错误');
-  }
-}
-async function getDataSlideShipClient(dbController) {
-  try {
-    const resDate = await dbController.find().exec();
-    
-    // 提取特定字段并构建新的结果数组
-    const extractedData = resDate.map(item => ({
-      clientName: item.clientName,
-      orderDate: item.orderDate
-    }));
-
-    return extractedData;
-  } catch (error) {
-    console.error('检索设备详情时出错：', error);
-    // 在这里你可以决定如何处理错误，例如返回适当的错误响应
-    throw new Error('服务器错误');
-  }
-}
-
-module.exports = { CreateInsert, Update,getData, Delete, getDatacd, UpdateNetwork, getDataSlideShip,GetEquipmentByIds, getDataSlideShipClient};
+module.exports = { CreateInsert, Update,GetCollectionsByCondition, Delete, GetCollections, UpdateNetwork, GetDataByfieldNameAndfieldValues,UpdateCollectionsByCollections,
+  GetCollectionsByCollections};
