@@ -17,25 +17,25 @@
             <el-form-item label="签收方">
               <el-row :gutter="5" style="width: 100%">
                 <el-col :span="10">
-                  <el-input style="width: 100%" v-model="formInline.shipName" placeholder="签收人姓名" clearable />
+                  <el-input style="width: 100%" v-model="formInline.signforName" placeholder="签收人姓名" clearable  :disabled="disabled"/>
                 </el-col>
                 <el-col :span="13">
-                  <el-input style="width: 100%" v-model="formInline.shipPhone" placeholder="签收人手机号" clearable />
+                  <el-input style="width: 100%" v-model="formInline.signforPhone" placeholder="签收人手机号" clearable  :disabled="disabled"/>
                 </el-col>
               </el-row>
             </el-form-item>
             <el-form-item label="签收日期">
-              <el-date-picker style="width: 100%" v-model="formInline.shipDate" type="date" clearable />
+              <el-date-picker style="width: 100%" v-model="formInline.signforDate" type="date" clearable  :disabled="disabled"/>
             </el-form-item>
             <el-form-item label="是否在库">
-              <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
+              <el-checkbox-group v-model="inventoryStatus" @change="handleinventoryStatusChange"  :disabled="disabled">
                 <el-checkbox v-for="city in cities" :key="city" :label="city">{{
                   city
                 }}</el-checkbox>
               </el-checkbox-group>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="onSubmit">确认保存</el-button>
+              <el-button type="primary" @click="onSubmit" :disabled="disabled">确认保存</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -48,62 +48,85 @@
 import { ref, reactive } from "vue";
 import axios from "axios";
 import type { FormProps } from "element-plus";
-import { ElMessage, ElMessageBox } from "element-plus";
-import type { Action } from "element-plus";
-import type { UploadInstance } from "element-plus";
-import type { UploadProps, UploadUserFile } from "element-plus";
+import { ElMessageBox } from "element-plus";
+import EventBus from "../assets/common/event-bus"
+import axiosServer from '../assets/common/axios-server'
+import qs from 'qs'; // 引入 qs 库
+import messageBox from '../assets/common/message-box'
+import funBox from '../assets/common/fun-box'
+
+//const disabled = ref(true)
 
 const labelPosition = ref<FormProps["labelPosition"]>("right");
+var orderDate  = null
+var clientName = ''
 const formInline = reactive({
   //这里就是获取的数据
-  shipName: "",
-  shipPhone: "",
-  shipDate: Date(),
+  signforName: "",
+  signforPhone: "",
+  signforDate: null,
 
 });
-var checkedCities = ref(['是'])
+var inventoryStatus = ref(['是'])
 var cities = ['是', '否']
 var status = 1;
 
 
 const change = () => {//判断是否在库
-  if (checkedCities.value.length == 0 || checkedCities.value.length == 2) {
+  if (inventoryStatus.value.length == 0 || inventoryStatus.value.length == 2) {
     status = 0;
-    ElMessageBox.alert('错误操作|只能单选', '提示：', {
-      confirmButtonText: '确认',
-    })
+    messageBox.MessageBox("错误只能单选")
     return;
   }
 }
+
+const formInlineCopy = formInline
+const FormDisplay = (data) => {
+  if (data.length != 0) {
+    data = data.pop()
+    if (data.emailName == '') {
+      //disabled.value = false
+    } else {
+      //disabled.value = true
+    }
+    inventoryStatus.value = [data.inventoryStatus]
+    Object.keys(data).forEach((key) => {
+      formInline[key] = data[key];
+    });
+  } else {
+    //disabled.value = false
+    formInline = formInlineCopy
+  }
+}
+var  orderDate  = null
+var clientName = ''
 const onSubmit = () => {
   status = 1;
   change();
   if (status == 0) {
     return;
   } else {
-    formInline.checkStatus = checkedCities.value[0];
+    formInline.inventoryStatus = inventoryStatus.value[0];
   }
-  //uploadRef.value!.submit()//发送文件服务端
-  //uploadData.append('clientName', formInline.clientName);
-  // axios.get('/users')
-  //     .then(response => {
-  //         console.log(response)
-  //     })
-  //     .catch(error => {
-  //         console.error(error)
-  //     })
-  //除上传图片，其他为空，则弹框，不请求
-  if (
-    formInline.shipName == "" ||
-    formInline.shipPhone == ""
-  ) {
-    ElMessageBox.alert("输入不能为空", "提示：", {
-      confirmButtonText: "确认",
-    });
-    return;
-  }
-  console.log(formInline)
+  const formInlineFields = Object.keys(formInline);  
+  if(funBox.checkRequiredFields(formInline, formInlineFields)){return}
+  formInline.orderDate = orderDate
+  formInline.clientName = clientName
+  axiosServer.AxiosPost(qs.stringify(formInline), '/ShipClient/AddSignfor').then(res => {
+    if (res.success == true) {
+      messageBox.MessageBox('保存成功')
+    } else {
+      messageBox.MessageBox('保存失败')
+    }
+  })
 };
+EventBus.on('slide-ship-order', async (val: any) => {
+    orderDate = val.orderDate
+    clientName = val.clientName
+    axiosServer.AxiosPost(val,'/ShipClient/GetSignfor').then(res=>{
+      FormDisplay(res)
+    })
+})
 </script>
   
 <style>

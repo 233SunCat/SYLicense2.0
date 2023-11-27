@@ -9,7 +9,7 @@
         <el-form class="demo-form-inline" :label-position="labelPosition" label-width="100px"
           style="max-width: 460px;width: 40%;">
           <el-form-item label="是否联网">
-            <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
+            <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange" :disabled="disabled">
               <el-checkbox v-for="city in cities" :key="city" :label="city">{{
                 city
               }}</el-checkbox>
@@ -17,12 +17,12 @@
           </el-form-item>
           <el-form-item label="联网设备台数">
                 <el-input style="width: 100%;" v-model="formInline.networdkEqNumber" placeholder="选择联网设备数量" clearable
-            @input="InputChange(formInline.networdkEqNumber)"/>
+            @input="InputChange(formInline.networdkEqNumber)" :disabled="disabled"/>
             </el-form-item>
           <el-form-item label="联网设备编号">
             <el-row :gutter="5" style="width: 100%">
               <el-col :span="8" v-for="item ,index in formInline.equipmentIds" :key="index">
-                <el-input style="width: 100%" v-model="formInline.equipmentIds[index]" clearable />
+                <el-input style="width: 100%" v-model="formInline.equipmentIds[index]" clearable :disabled="disabled"/>
               </el-col>
             </el-row>
           </el-form-item>
@@ -31,7 +31,7 @@
             <el-row :gutter="5" style="width: 100%">
               <el-col :span="8">
                 <el-input type="number" min="0" style="width: 100%;" v-model="formInline.protectTime" placeholder="请输入数字"
-                  clearable @input="PeriodInput" />
+                  clearable @input="PeriodInput" :disabled="disabled"/>
               </el-col>
               <el-col :span="3">
                 <el-text>年</el-text>
@@ -44,7 +44,7 @@
           </el-form-item>
 
           <el-form-item>
-            <el-button type="primary" @click="NetworkUpdate">确认</el-button>
+            <el-button type="primary" @click="NetworkUpdate" :disabled="disabled">确认</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -56,17 +56,16 @@
 <script lang="ts" setup>
 //模块
 import { ref, reactive } from 'vue'
-import axios from "axios";
 import type { FormProps } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import dayjs from 'dayjs'
-import { fi } from 'element-plus/es/locale';
-import axiosServer from '../assets/common/axios-server.js'
+import axiosServer from '../assets/common/axios-server'
 import qs from 'qs'; // 引入 qs 库
 import EventBus from "../assets/common/event-bus"
 
 //数据
 const time = ref('')
+const disabled = ref(true)
 const labelPosition = ref<FormProps['labelPosition']>('right')
 interface FormInlineData {
   networdkEqNumber: number;
@@ -161,19 +160,7 @@ const GetEqStart = () => {//获得机器在库开始时间
 
 
 
-/**
- * 增
- */
-const NetworkUpdate= () => {//提交
-  status = 1;
-  statusPack()
-  if (status == 0) {
-    return;
-  }
-  console.log(formInline)
-  axiosServer.AxiosPost(qs.stringify(formInline), '/ShipClient/UpdateNetwork')
-  return;
-}
+
 const formMap = (result) => {
     return result.map(item => ({equipmentName:item.equipmentName, equipmentModule:item.equipmentModule,equipmentStyle:item.equipmentStyle, equipmentId:item.equipmentId}))
 }
@@ -215,10 +202,12 @@ const processEquipmentData = (data: Record<string, any>[]): EquipmentInfo[] => {
 
   return equipmentInfoArray;
 };
+
+//{"equipmentName": "力反馈腹腔镜","equipmentModule": ["镜头训练" ],"equipmentStyle": "TTT","equipmentId": "4444","equipmentIds": ["4444"],"str": ["4444" ],"equipmentNumber": 1}
 EventBus.on('slide-ship', async (val: any) => {
   console.log('订单=联网', val)
   const result = await GetEquipmentByIds(val)
-  const data = formMap(result)
+  const data = formMap(result.filter(item => item.equipmentNetwork!=''))
   const formData =  processEquipmentData(data)
   formData.forEach((item,i)=>{
     item.equipmentIds.forEach((res,index) => {
@@ -226,8 +215,21 @@ EventBus.on('slide-ship', async (val: any) => {
     })
 })
   formInline.networdkEqNumber = formInline.equipmentIds.length
-
+  formInline.protectTime = result.pop().protectTime
 })
+/**
+ * 增
+ */
+const NetworkUpdate= () => {//提交
+  status = 1;
+  statusPack()
+  if (status == 0) {
+    return;
+  }
+  console.log(formInline)
+  axiosServer.AxiosPost(qs.stringify(formInline), '/ShipClient/UpdateNetwork')
+  return;
+}
 </script>
   
 <style>

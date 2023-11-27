@@ -59,7 +59,6 @@ const handleMenuItemClick=(menuItem: any) =>{
 onMounted(() => {  
   const handleMessage = (message: string) => {  
     //console.log('加载输出数据',message)
-
   };  
   EventBus.on('message', handleMessage); 
 }) 

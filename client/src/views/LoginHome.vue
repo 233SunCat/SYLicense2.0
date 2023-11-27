@@ -5,7 +5,7 @@
           <div class="container">
               <div class="drop">
                   <div class="content">
-                      <h2 :style="{ color: '#3399ff' }">Sooyan后台管理系统</h2>
+                      <h2 :style="{ color: '#3399ff' }">Sooyan后台管理系</h2>
                       <form>
                           <div class="inputBox">
                               <el-input type="text" v-model="account.name" placeholder="用户名" />
@@ -27,7 +27,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import type { FormProps } from 'element-plus'
-import axiosServer from '../assets/common/axios-server.js'
+import axiosServer from '../assets/common/axios-server'
 import qs from 'qs'; // 引入 qs 库
 import messageBox from '../assets/common/message-box.js'
 import { useRouter } from "vue-router";
@@ -39,19 +39,21 @@ const router = useRouter();
 * 登录结果处理
 */
 const HanleLoginResult = (res: any) => {
-  if (res === 'Login successful') {
-      router.push({ path: '/App' })
-  }
-  if (res === 'Invalid password') {
-      messageBox.MessageBox('密码错误')
+  // if (res === 'Login successful') {
+  //     router.push({ path: '/App' })
+  // }
+  // if (res === 'Invalid password') {
+  //     messageBox.MessageBox('密码错误')
 
-  }
-  if (res === 'User not found') {
-      messageBox.MessageBox('用户不存在')
-  }
-  if (res === 'Internal Server Error') {
-      messageBox.MessageBox('网络错误')
-  }
+  // }
+  // if (res === 'User not found') {
+  //     messageBox.MessageBox('用户不存在')
+  // }
+  // if (res === 'Internal Server Error') {
+  //     messageBox.MessageBox('网络错误')
+  // }
+  router.push({ path: '/App' })
+
 }
 const HandleLoginButton = async () => {
   const res = await axiosServer.AxiosPost(qs.stringify(account.value), '/Login')

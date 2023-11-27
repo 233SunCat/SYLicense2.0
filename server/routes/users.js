@@ -10,13 +10,20 @@ router.get('/', function(req, res, next) {
   res.send('respond with a resource');
   console.log(res);
 });
-router.post('/', async function (req, res, next) {
-
+router.post('/UserAdd', async function (req, res, next) {
+  console.log(req.body)
   // 确保已经连接到数据库  
-  //dbController.CreateInsert(Fault, {modelName:'虚实结合腹腔镜',modelStyle:'BBQ'});
-  const resDate =  await dbController.CreateInsert(Fault, req.data);
+
+});
+router.post('/UserPermissionSearch', async function (req, res, next) {
+  const keyword = req.body.keyword
+  const selectedOption = req.body.selectedOption
+  const resDate =  await dbController.GetCollectionsByCondition(Fault,keyword, selectedOption);
+  //await dbController.CreateInsert(Fault, req.body);
+  console.log('resDate',resDate)
   res.send(resDate)
 });
+
 
 module.exports = router;
 

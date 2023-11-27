@@ -1,13 +1,14 @@
 
 
-//多条插入，没有集合自动创建
-function CreateInsert(dbController, data) {
-    const InsertName = new dbController(data)
-    InsertName.save().then(result => {
-        //console.log(result)
+async function CreateInsert(dbController, data) {
+  var resultStatus;
+  const InsertName = new dbController(data)
+  await InsertName.save().then(result => {
+      resultStatus = { success: true};
     }).catch(err => {
-        //console.log(err)
+      resultStatus = { success: false};
     })
+  return resultStatus
 }
 
 //多条更新|条件1
@@ -40,23 +41,21 @@ function Delete(dbController, deleteId) {
 
 }
 /**
- * 条件：多字段单数据，修改：多字段单数据
+ * 条件：多字段单数据，修改：多字段多数据
  * @param {A:1,B:2..} query 
  * @param {C:1,D:2..} update 
  */
-async function UpdateCollectionsByCollections(query, update) {
+async function UpdateCollectionsByCollections(dbController, query, update) {
   try {
-    const result = await YourModel.updateMany(query, update);
-    //console.log('Update result:', result);
-  } catch (error) {
-    //console.error('Error in updateDocuments:', error);
-    throw error;
+    const result = await dbController.updateMany(query, update);
+    console.log('Update result:', result.nModified, 'records modified');
+    return { success: true, modifiedCount: result.nModified };
+  } catch (err) {
+    console.error('Update error:', err);
+    return { success: false, error: err.message };
   }
 }
-/**
- * 
- * @param {*} query 
- */
+
 // 使用示例
 // const query = {
 //   equipmentId: 'yourEquipmentId', // 替换为你的具体 equipmentId
@@ -68,7 +67,7 @@ async function GetCollectionsByCollections(dbController,query) {
     return result
   } catch (error) {
     console.error('Error in findDocuments:', error);
-    throw error;
+    return result
   }
 }
 
@@ -137,6 +136,49 @@ async function GetCollections(dbController) {//searchData[{}],startDate,endDate,
     res.status(500).send('服务器错误');  
   }  
 }
+async function GetCollectionsByDateRange(dbController, startDate, endDate) {
+  try {
+    // 构建查询条件，限制 eveDate 在 startDate 和 endDate 之间
+    const query = {
+      eventDate: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    };
+    const result = await dbController.find(query);
+    console.log('Query result:', result);
+    return result;
+  } catch (error) {
+    // 处理错误
+    console.error('Error in QueryCollectionsByDateRange:', error);
+    throw error;
+  }
+}
+async function GetCollectionsByKeywordAndDate (dbController, keyword,keywordFields,startDate ,endDate,dateFields ){
+  var dynamicConditions
+  console.log('dateFields',dateFields)
+  // 构建动态查询条件
+  if(dateFields.length == 0){
+    dynamicConditions = {
+      $and: [
+        { $or: keywordFields.map(field => ({ [field]: { $regex: keyword, $options: 'i' } })) }
+      ]
+    };
+  }else{
+    dynamicConditions = {
+      $and: [
+        { $or: dateFields.map(field => ({ [field]: { $gte: startDate, $lte: endDate } })) },
+        { $or: keywordFields.map(field => ({ [field]: { $regex: keyword, $options: 'i' } })) }
+      ]
+    };
+  }
 
-module.exports = { CreateInsert, Update,GetCollectionsByCondition, Delete, GetCollections, UpdateNetwork, GetDataByfieldNameAndfieldValues,UpdateCollectionsByCollections,
-  GetCollectionsByCollections};
+    return result = await dbController.find(dynamicConditions);
+}
+module.exports = { CreateInsert, Update,GetCollectionsByCondition, Delete, 
+  GetCollections, UpdateNetwork, 
+  GetDataByfieldNameAndfieldValues,
+  UpdateCollectionsByCollections,
+  GetCollectionsByCollections,
+  GetCollectionsByDateRange,
+  GetCollectionsByKeywordAndDate};

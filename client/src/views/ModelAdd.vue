@@ -118,6 +118,7 @@ const onSubmit = () => {//提交
   if(status == 0){
     return;
   }
+  console.log('formInline',formInline)
   axios({
       url: '/Model/ModelAdd',
       data: formInline,

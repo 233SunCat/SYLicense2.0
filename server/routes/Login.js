@@ -11,6 +11,7 @@ router.post('/', async function (req, res, next) {
     // 确保已经连接到数据库  
     //dbController.CreateInsert(Fault, {modelName:'虚实结合腹腔镜',modelStyle:'BBQ'});
     const {username, password} = req.body
+    console.log('req.body',req.body)
     try {
         // 查找用户
         const user = await User.findOne({ username });
@@ -34,5 +35,4 @@ router.post('/', async function (req, res, next) {
         res.send('Internal Server Error');
       }
   });
-
   module.exports = router;

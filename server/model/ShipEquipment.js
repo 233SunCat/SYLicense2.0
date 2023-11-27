@@ -14,7 +14,7 @@ const ShipClient = Mongoose.Schema({
   },
   orderDate: {//订单时间
     type: Date,
-    default: Date.now
+    default: null
   },
   equipmentName: {//订单设备名称
     type: String,
@@ -30,7 +30,7 @@ const ShipClient = Mongoose.Schema({
   },
   equipmentModule:{//订单设备模块
     type: [String],
-    default: ['']
+    default: null
   },
   equipmentNetwork:{//是否联网
     type: String,
@@ -40,19 +40,19 @@ const ShipClient = Mongoose.Schema({
     type: String,
     default: ""
   },
-  ReceivingName:{//收货人姓名
+  receivingName:{//收货人姓名
     type: String,
     default: ""
   },
-  ReceivingPhone:{//收货人手机号
+  receivingPhone:{//收货人手机号
     type: String,
     default: ""
   },
-  ReceivingCity:{//收货地址
+  receivingCity:{//收货地址
     type: String,
     default: ""
   },
-  equipmentReceivingCompany:{//收货机构
+  receivingCompany:{//收货机构
     type: String,
     default: ""
   },
@@ -60,9 +60,9 @@ const ShipClient = Mongoose.Schema({
     type: String,
     default: ""
   },
-  receivingDate_q:{//期望到货时间
+  receivingDate:{//期望到货时间
     type: Date,
-    default: Date.now
+    default: null
   },
   emailName:{//发货人姓名
     type: String,
@@ -86,7 +86,7 @@ const ShipClient = Mongoose.Schema({
   },
   emailDate:{//发货时间
     type: Date,
-    default: Date.now
+    default: null
   },
   shippingCost:{//物流费用
     type: String,
@@ -106,8 +106,12 @@ const ShipClient = Mongoose.Schema({
   },
   signforDate:{//签收日期
     type: Date,
-    default: Date.now
+    default: null
   },
+  inventoryStatus:{//是否在库
+    type: String,
+    default: ""
+  },  
   acceptName:{//验收方姓名
     type: String,
     default: ""
@@ -118,7 +122,7 @@ const ShipClient = Mongoose.Schema({
   },
   acceptDate:{//验收日期
     type: Date,
-    default: Date.now
+    default: null
   },
   dealer:{//代理商信息
     type: String,
@@ -126,7 +130,7 @@ const ShipClient = Mongoose.Schema({
   },
   contractSignDate:{//合同签订日期
     type: Date,
-    default: Date.now
+    default: null
   },
   contractMoney:{//合同签订金额
     type: String,
@@ -134,29 +138,29 @@ const ShipClient = Mongoose.Schema({
   },
   paymentDate:{//付款日期
     type: Date,
-    default: Date.now
+    default: null
   },
   paymentMethod:{//付款方式
     type: String,
     default: ""
   },
-  winning_bid_price:{//中标价格
+  winningBidPrice:{//中标价格
     type: String,
     default: ""
   },
-  service_fee:{//服务费
+  serviceFee:{//服务费
     type: String,
     default: ""
   },
-  invoice_status:{//开票情况
+  invoiceStatus:{//开票情况
     type: String,
     default: ""
   },
-  invoice_date:{//开票日期
+  invoiceDate:{//开票日期
     type: Date,
-    default: Date.now
+    default: null
   },
-  invoice_number:{//开票编号
+  invoiceNumber:{//开票编号
     type: String,
     default: ""
   }

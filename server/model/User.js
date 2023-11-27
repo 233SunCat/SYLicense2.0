@@ -5,16 +5,6 @@ const bcrypt = require('bcryptjs');
 const UserSchema = Mongoose.Schema({
   wxid: String,
 
-  userName: {
-    type: String,
-    default: ""
-  },
-
-  password: {
-    type: String,
-    default: ""
-  },
-
   nickName: {//昵称
     type: String,
     default: ""
@@ -26,11 +16,12 @@ const UserSchema = Mongoose.Schema({
   },
 
   permission: {
-    type: Number,
-    default: 0
+    type: String,
+    default: ""
   },
   wxID:{
-
+    type: String,
+    default: ""
   },
   applyDate:{//申请时间
     type: Date,
@@ -39,6 +30,10 @@ const UserSchema = Mongoose.Schema({
   applyStatus:{
     type: String,
     default: ""
+  },
+  operation:{
+    type: Number,
+    default: 0
   }
 }
 );

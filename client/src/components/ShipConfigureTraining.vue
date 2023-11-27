@@ -25,8 +25,7 @@
                 <el-dialog v-model="dialogEqAdd" title="添加设备" style="width: 500px;">
                   <el-form-item label="选择设备：">
                     <el-select style="width: 50%" v-model="equipmentSelect" placeholder="请选择设备" clearable>
-                      <el-option label="力反馈腹腔镜" value="力反馈腹腔镜" />
-                      <el-option label="虚实结合腹腔镜" value="虚实结合腹腔镜" />
+                      <el-option v-for="item in selectEquipmentName" :label="item" :value="item" :key="item"/>
                     </el-select>
                   </el-form-item>
                   <el-form-item label="确定">
@@ -80,20 +79,20 @@
 <script lang="ts" setup>
 import { ref, reactive, inject } from 'vue'
 import { CirclePlus } from "@element-plus/icons-vue";
-
 import type { FormProps } from 'element-plus'
-import { ElMessage, ElMessageBox } from 'element-plus'
 import ConfigureTrainingApply from './ConfigureTrainingApply.vue'
 import EventBus from "../assets/common/event-bus"
-import axiosServer from '../assets/common/axios-server.js'
+import axiosServer from '../assets/common/axios-server'
 import qs from 'qs'; // 引入 qs 库
+import messageBox from '../assets/common/message-box'
+import * as constants from '../constants.json';
 
-const input = ref('')
+const selectEquipmentName = constants.selectEquipmentName
 var dialogFormVisible = ref(false)
 var dialogEqAdd = ref(false)
 const equipmentSelect = ref('')
 const netDisabled = ref(true)
-var equipmentIds = ref()
+const addDisabled = ref(false)
 const labelPosition = ref<FormProps['labelPosition']>('right')
 type Equipment = {
   equipmentName: string;
@@ -127,7 +126,6 @@ const formInline = reactive<FormInlineData>({//这里就是获取的数据
   orderStatus: ''
 })
 
-const items = ref(['实物训练', '基础技能训练'])
 const activities = [
   {
     buttonText: '下载生成工具',
@@ -148,21 +146,23 @@ const activities = [
 ]
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
-const checkedCities = ref([])
-const cities = ['镜头训练', '分离训练', 'FLS技能训练', '剪切训练', '钛夹训练', '电凝训练', '双手合作训练', '抓取训练']
-const ClientName = ref('')
-interface FormData {
-  // 其他字段...
-  items: { clientName: string; /* 其他字段... */ }[];
-}
-
-const InputChange = (num: any) => {//输入框触发
-  //equipmentIds = num
-  //equipmentIds.value = InputNumArry(num)
+const cities = constants.Module
+/**
+ * 
+ * 输入框触发
+ */
+const InputChange = (num: any) => {
   formInline.equipmentIds = Array.from({ length: num }, () => "");
 }
-
-//接受菜单栏医院名称，同时触发事件从加载医院数据
+/**
+ * 输入框清零
+ */
+ const InputClean = () => {
+  formInline.equipmentIds = []
+  formInline.equipmentModule = []
+  formInline.equipmentStyle = ''
+  formInline.equipmentNumber = ''
+}
 const handleCheckAllChange = (val: boolean) => {
   formInline.equipmentModule = val ? cities : []
   isIndeterminate.value = false
@@ -172,7 +172,6 @@ const handleCheckedCitiesChange = (value: string[]) => {
   checkAll.value = checkedCount === cities.length
   isIndeterminate.value = checkedCount > 0 && checkedCount < cities.length
 }
-
 const generateNewEquipmentInfo = (name) =>{
     return {
     equipmentName: name,
@@ -184,8 +183,6 @@ const generateNewEquipmentInfo = (name) =>{
     equipmentNumber: 0,
   };
 }
-
-
 //查看数据
 // 定义设备信息的接口
 interface EquipmentInfo {
@@ -202,7 +199,6 @@ interface EquipmentInfo {
 }
 const processEquipmentData = (data: Record<string, any>[]): EquipmentInfo[] => {
   const equipmentInfoMap: Record<string, EquipmentInfo> = {};
-
   // 遍历原始数据数组
   data.forEach(item => {
     const key = `${item.equipmentName}-${item.equipmentModule.join('-')}-${item.equipmentStyle}`;
@@ -234,22 +230,6 @@ const processEquipmentButton = (data) => {//生成动态按钮
 const formMap = (result) => {
     return result.map(item => ({equipmentName:item.equipmentName, equipmentModule:item.equipmentModule,equipmentStyle:item.equipmentStyle, equipmentId:item.equipmentId}))
 }
-//event,forminline,
-const slideFormInline = (val) => {
-  formInline.clientName = val.clientName
-  formInline.orderDate = val.orderDate
-  formInline.orderStatus = val.orderStatus
-}
-const GetEquipmentByIds = async (val) => {//组件-数据库获得表单
-  try {
-     const equipmentIds = val.equipmentIds.split(',')
-    const res = await axiosServer.AxiosPost(qs.stringify(equipmentIds), '/ShipClient/GetEquipmentByIds');
-    return res;
-  } catch (error) {
-    console.error('GetEquipmentByIds error:', error);
-    throw error; 
-  }
-};
 const NetDisable = () => {//组件-禁止输入
   netDisabled.value = true;
 }
@@ -257,33 +237,44 @@ const NotNetDisable = () => {//组件-y允许输入
   netDisabled.value = false;
 }
 /**
- * 输入框清零
+ * 下拉框选择设备
+ * @param name 
  */
-const InputClean = () => {
-  formInline.equipmentIds = []
-  formInline.equipmentModule = []
-  formInline.equipmentStyle = ''
-  formInline.equipmentNumber = ''
+const EquipmentSelect = (name: any) => {//下拉框选择设备
+  dialogEqAdd.value = false
+  formInline.equipmentName = name;
+  const data = generateNewEquipmentInfo(name)
+  formInline.equipmentNames.push(data)
+  NotNetDisable()
+  InputClean()
 }
-const addDisabled = ref(true)
 /**
- * 直接加载
+ * 添加新的设备
  */
-EventBus.on('slide-ship', async (val: any) => {
-  addDisabled.value = false
-  console.log('设备订单',val)
-  slideFormInline(val)
-  const result = await GetEquipmentByIds(val)
-  const data = formMap(result)
-  const formData =  processEquipmentData(data)
-  processEquipmentButton(formData)
-  //isInputDisabled(val)
-})
+const EquipmentAdd = () => {//触发事件-增加设备
+  dialogEqAdd.value = true
+}
+/**
+ * 保存设备信息
+ */
+const EquipmentSubmit = () => {//保存失败弹框
+  console.log('formInline',formInline)
+  const { equipmentNames, ...newfornInline } = formInline;
+  //发送请求.
+  axiosServer.AxiosPost(qs.stringify(newfornInline), '/ShipClient/AddShipEquipment').then(res => {
+      if(res.success == true){
+
+            messageBox.MessageBox('保存成功')
+        }else{
+            messageBox.MessageBox('保存失败')
+        }
+  })
+}
 /**
  * 查看单类型设备信息
  * @param item 
  */
-const HandleFormSearch = (item) => {//内存表单查询
+ const HandleFormSearch = (item) => {//内存表单查询
   formInline.equipmentIds = []
   formInline.equipmentNumber = item.equipmentNumber
   formInline.equipmentStyle = item.equipmentStyle
@@ -295,45 +286,20 @@ const HandleFormSearch = (item) => {//内存表单查询
 }
 
 /**
- * 下拉框选择设备
- * @param name 
+ * 直接加载
  */
-const EquipmentSelect = (name: any) => {//下拉框选择设备
-  dialogEqAdd.value = false
-  formInline.equipmentName = name;
-  const data = generateNewEquipmentInfo(name)
-  formInline.equipmentNames.push(data)
-}
-/**
- * 添加新的设备
- */
-const EquipmentAdd = () => {//触发事件-增加设备
-  dialogEqAdd.value = true
-  NotNetDisable()
-  InputClean()
-}
-/**
- * 保存设备信息
- */
-const EquipmentSubmit = () => {//保存失败弹框
-  var newfornInline = reactive({//这里就是获取的数据
-  equipmentStyle: formInline.equipmentStyle,
-  equipmentNumber: formInline.equipmentNumber,
-  equipmentIds: formInline.equipmentIds,
-  equipmentName: formInline.equipmentName,
-  equipmentModule: formInline.equipmentModule,
-  clientName: formInline.clientName,
-  orderDate: formInline.orderDate,
-  orderStatus: formInline.orderStatus
+EventBus.on('slide-ship-order', async (val: any) => {
+    NetDisable();
+    console.log('val',val)
+    formInline.clientName = val.clientName
+    formInline.orderDate = val.orderDate
+    formInline.orderStatus = val.orderStatus
+    axiosServer.AxiosPost(val,'/ShipClient/GetShipEquipmentNames').then(res=>{//res = [],如果id存在[{}...]，id不存在[]
+      const data = formMap(res)
+      const formData =  processEquipmentData(data)
+      processEquipmentButton(formData)
+    })
 })
-  //发送请求
-  axiosServer.AxiosPost(qs.stringify(newfornInline), '/ShipClient/AddEquipment').then(
-  //   ElMessageBox.alert('保存失败', '提示：', {
-  //   confirmButtonText: '确认',
-  // })
-  )
-}
-
 </script>
   
 <style lang="less">

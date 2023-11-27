@@ -14,7 +14,7 @@
         <el-col :span="15">
         </el-col>
         <el-col :span="2">
-          <el-button style="text-align: right" type="primary" icon="el-icon-download" @click="dataSearch">数据查询</el-button>
+          <el-button style="text-align: right" type="primary" icon="el-icon-download" @click="dataSearch">数据查</el-button>
         </el-col>
       </el-row>
       <!--Excel表格导出-->>

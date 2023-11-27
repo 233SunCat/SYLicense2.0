@@ -1,8 +1,9 @@
 <template>
-  <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
+  <el-menu default-active="2" class="el-menu-vertical-demo"
     background-color="#f3f5f6" style="height: 100%;">
     <el-sub-menu :index="item.key + ''" v-for="item in menus" :key="item.key" style="width: auto;">
       <template #title>
+        <el-icon><Calendar /></el-icon>
         <span>{{ item.key }}</span>
       </template>
       <el-menu-item style="padding: 10px; " :index="item.key + subItem.clientName + ''" v-for="subItem in item.items"
@@ -18,16 +19,11 @@
   
 <script lang="ts" setup>
 import {
-  Document,
-  Menu as IconMenu,
-  Location,
-  Setting,
+  Calendar
 } from '@element-plus/icons-vue'
-import axios from "axios";
 import { ref, reactive, provide, inject, onMounted } from 'vue';
 import EventBus from "../assets/common/event-bus"
-import axiosServer from '../assets/common/axios-server.js'
-import { result } from 'lodash';
+import axiosServer from '../assets/common/axios-server'
 
 var menus = ref();
 // 定义分组的类型接口  
@@ -43,38 +39,13 @@ interface Item {
   orderDate: string;
   __v: number;
 }
-const handleOpen = (key: string, keyPath: string[]) => {//
-}
-const handleClose = (key: string, keyPath: string[]) => {//
-}
-
-//get axios data
-// axios.get('/')
-//     .then(response => {
-//         console.log(response)
-//         menus = response.data;
-//     })
-//     .catch(error => {
-//         console.error(error)
-//     })
-const shuzu = reactive({ title: '123' })
-
-
-
-//通信-page-slide
-onMounted(() => {
-  const handleMessage = (message: string) => {//
-
-  };
-  //EventBus.on('message', handleMessage); 
-})
 
 const fenlei = (data) => {
-
   type Item = {
     clientName: string;
-    orderDate: string;
+    orderDate: Date;
     equipmentId: string;
+    orderStatus: string;
   };
 
   type Entry = {
@@ -84,39 +55,36 @@ const fenlei = (data) => {
 
   type MergedData = Entry[];
 
-  const originalData: MergedData = data
+  const originalData: MergedData = data;
 
-  // Function to merge items with the same clientName and orderDate
   const mergeItems = (items: Item[]): Item[] => {
-    const mergedItems: Record<string, string[]> = {};
+    const mergedItems: Record<string, Item> = {};
 
     items.forEach((item) => {
-      const year = item.orderDate;
+      const orderDate = item.orderDate instanceof Date ? item.orderDate : new Date(item.orderDate);
+      const year = orderDate.getFullYear();
       const itemKey = `${item.clientName}+${year}`;
 
-      if (mergedItems[itemKey]) {
-        mergedItems[itemKey].push(item.equipmentId);
+      if (!mergedItems[itemKey]) {
+        // 使用原始的 orderDate 字段值
+        mergedItems[itemKey] = { ...item, orderDate };
       } else {
-        mergedItems[itemKey] = [item.equipmentId];
+        mergedItems[itemKey].equipmentId += `, ${item.equipmentId}`;
       }
     });
 
-    return Object.entries(mergedItems).map(([key, equipmentIds]) => {
-      const [clientName, year] = key.split("+");
-      return { clientName, orderDate: year, equipmentId: equipmentIds.join(", ") };
-    });
+    return Object.values(mergedItems);
   };
 
-  // Merge items for each entry
   const mergedData: MergedData = originalData.map((entry) => ({
     key: entry.key,
     items: mergeItems(entry.items),
   }));
+  return mergedData;
+};
 
 
 
-  return mergedData
-}
 const YearMonTurn = (collection) => {
   // 处理后的数组，以年月为分组标准  
   let groupedCollection: Group[] = [];
@@ -148,6 +116,7 @@ const YearMonTurn = (collection) => {
       });
     }
   }
+  console.log('groupedCollection',groupedCollection)
   return groupedCollection
 }
 /**
@@ -155,12 +124,11 @@ const YearMonTurn = (collection) => {
  */
 const ShipMenuSlide = () => {//返回时间，用户
   axiosServer.AxiosGet('/ShipClient/ShipMenu').then(collection => {
-    console.log('collection',collection)
+
     menus.value = fenlei(YearMonTurn(collection))
   })
 }
 ShipMenuSlide()
-
 /**
  * 侧边栏触发事件
  * @param menuItem  
@@ -168,8 +136,9 @@ ShipMenuSlide()
 const handleMenuItemClick = (menuItem: any) => {
   //emit('add', shuzu)
   // 这里处理菜单项的点击事件  
-  console.log("点击了菜单项：", menuItem.orderStatus);
-  EventBus.emit("slide-ship", { clientName: menuItem.clientName, orderDate: menuItem.orderDate, equipmentIds: menuItem.equipmentId ,orderStatus:'已中标'});
+  console.log("点击了菜单项：", { clientName: menuItem.clientName, orderDate: menuItem.orderDate, equipmentIds: menuItem.equipmentId ,orderStatus:menuItem.orderStatus});
+  EventBus.emit("slide-ship", { clientName: menuItem.clientName, orderDate: menuItem.orderDate, equipmentIds: menuItem.equipmentId ,orderStatus:menuItem.orderStatus});
+  EventBus.emit("slide-ship-order", { clientName: menuItem.clientName, orderDate: menuItem.orderDate,orderStatus:menuItem.orderStatus});
 }
 </script>
   

@@ -14,24 +14,24 @@
         </el-menu-item>
         <el-sub-menu index="1" height="100%">
           <template #title>
-            <el-icon><location /></el-icon>
-            <span>产品模块</span>
+            <el-icon><Menu /></el-icon>           
+             <span>产品模块</span>
           </template>
           <!-- <router-link to="/ForceFeedback"><el-menu-item index="1-1">力反馈腹腔镜</el-menu-item></router-link> -->
-          <router-link style="  text-decoration: none;" to="/ForceFeedback"><el-menu-item index="1-2">虚实结合腹腔镜</el-menu-item></router-link>
-            <el-menu-item index="1-3">消化内镜</el-menu-item>
+          <router-link style="  text-decoration: none;" to="/ProductModule"><el-menu-item index="1-2">产品模块管理</el-menu-item></router-link>
         </el-sub-menu>
         <el-sub-menu index="2" height="100%">
           <template #title>
-            <el-icon><location /></el-icon>
+            <el-icon><Van /></el-icon>            
             <span>发货信息</span>
           </template>
-          <router-link style="  text-decoration: none;" to="/UserAdd"><el-menu-item  index="2-1">新增用户</el-menu-item></router-link>
-          <router-link style="  text-decoration: none;" to="/ShipMessage"><el-menu-item  index="2-1">发货信息</el-menu-item></router-link>
+          <router-link style="  text-decoration: none;" to="/ShipAdd"><el-menu-item  index="2-1">新增用户</el-menu-item></router-link>
+          <router-link style="  text-decoration: none;" to="/ShipMessage"><el-menu-item  index="2-2">发货信息</el-menu-item></router-link>
+          <router-link style="  text-decoration: none;" to="/ShipSearch"><el-menu-item  index="2-3">用户总表</el-menu-item></router-link>
         </el-sub-menu>
         <el-sub-menu index="3" height="100%">
           <template #title>
-            <el-icon><location /></el-icon>
+            <el-icon><Tools /></el-icon>            
             <span>设备报修</span>
           </template>
           <router-link style="  text-decoration: none;" to="/Equipment/EquipmentSubmit"><el-menu-item index="3-1">报修登记</el-menu-item></router-link>
@@ -39,7 +39,7 @@
         </el-sub-menu>
         <el-sub-menu index="4" height="100%">
           <template #title>
-            <el-icon><location /></el-icon>
+            <el-icon><Orange /></el-icon>            
             <span>样机流转</span>
           </template>
           <router-link style="  text-decoration: none;" to="/ModelAdd"><el-menu-item index="4-1">新建样机</el-menu-item></router-link>
@@ -48,10 +48,10 @@
         </el-sub-menu>
         <el-sub-menu index="5" height="100%">
           <template #title>
-            <el-icon><location /></el-icon>
+            <el-icon><User /></el-icon>            
             <span>用户权限</span>
           </template>
-          <router-link style="  text-decoration: none;" to="/PermissionsApply"><el-menu-item index="5-1">待开权限</el-menu-item></router-link>
+          <router-link style="  text-decoration: none;" to="/PermissionsSearch"><el-menu-item index="5-1">待开权限</el-menu-item></router-link>
           <router-link style="  text-decoration: none;" to="/ModelApply"><el-menu-item index="5-2">审核权限</el-menu-item></router-link>
         </el-sub-menu>
       </el-menu>
@@ -59,10 +59,7 @@
 
 <script lang="ts" setup>
 import {
-  Document,
-  Menu as IconMenu,
-  Location,
-  Setting,
+  Menu,Van,Orange,Tools,User
 } from '@element-plus/icons-vue'
 const handleOpen = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
@@ -72,5 +69,4 @@ const handleClose = (key: string, keyPath: string[]) => {
 }
 </script>
 <style>
-
 </style>

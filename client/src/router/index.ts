@@ -1,17 +1,20 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import ForceFeedback from '../views/ForceFeedback.vue'
-import UserAdd from '../views/UserAdd.vue'
+import ShipAdd from '../views/ShipAdd.vue'
 import EquipmentSubmit from '../views/EquipmentSubmit.vue'
 import EquipmentSearch from '../views/EquipmentSearch.vue'
 import ModelAdd from '../views/ModelAdd.vue'
 import EquipmentDetail from '../views/EquipmentDetail.vue'
 import PermissionsApply from '../views/PermissionsApply.vue'
+import PermissionsSearch from '../views/PermissionsSearch.vue'
 import MTmessage from '../views/MTmessage.vue'
 import MTapply from '../views/MTapply.vue'
 import ShipMessage from '../views/ShipMessage.vue'
 import LoginHome from '../views/LoginHome.vue'
 import App from '../App.vue'
+import ProductModule from '../views/ProductModule.vue'
+import ShipSearch from '../views/ShipSearch.vue'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -29,15 +32,10 @@ const routes: Array<RouteRecordRaw> = [
         component: ShipMessage
       },
       {
-        path: '/UserAdd',
-        name: 'UserAdd',
-        component: UserAdd,
+        path: '/ShipAdd',
+        name: 'ShipAdd',
+        component: ShipAdd,
     
-      },
-      {
-        path: '/ForceFeedback',
-        name: 'ForceFeedback',
-        component: ForceFeedback
       },
       {
         path: '/Equipment/EquipmentSubmit',
@@ -60,9 +58,9 @@ const routes: Array<RouteRecordRaw> = [
         component: EquipmentDetail
       },
       {
-        path: '/PermissionsApply',
-        name: 'PermissionsApply',
-        component: PermissionsApply
+        path: '/PermissionsSearch',
+        name: 'PermissionsSearch',
+        component: PermissionsSearch
       },
       {
         path: '/MTmessage',
@@ -73,6 +71,16 @@ const routes: Array<RouteRecordRaw> = [
         path: '/MTapply',
         name: 'MTapply',
         component: MTapply
+      },
+      {
+        path: '/ProductModule',
+        name: 'ProductModule',
+        component: ProductModule
+      },
+      {
+        path: '/ShipSearch',
+        name: 'ShipSearch',
+        component: ShipSearch
       },
     ],
   },
