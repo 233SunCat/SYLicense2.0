@@ -7,8 +7,7 @@
             </el-form-item>
             <el-form-item label="设备名称">
                 <el-select style="width: 100%;" v-model="formInline.equipmentName" placeholder="设备名称" clearable>
-                    <el-option label="力反馈腹腔镜" value="力反馈腹腔镜" />
-                    <el-option label="虚实结合腹腔镜" value="虚实结合腹腔镜" />
+                    <el-option v-for="item in equipmentNames" :key="item" :label="item" :value="item" />
                 </el-select>
             </el-form-item>
             <el-form-item label="设备编号">
@@ -54,8 +53,10 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type { Action } from 'element-plus'
 import type { UploadInstance } from 'element-plus'
 import type { UploadProps, UploadUserFile } from 'element-plus'
+import * as components from '../constants.json'
+import axiosServer from '../assets/common/axios-server'
 
-
+const equipmentNames = components.selectEquipmentName
 const labelPosition = ref<FormProps['labelPosition']>('right')
 const formInline = reactive({//这里就是获取的数据
     clientName: '',
@@ -73,16 +74,7 @@ const handleChange: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
     uploadData.append('file', file)
 }
 
-const onSubmit = () => {
-    //uploadRef.value!.submit()//发送文件服务端
-    //uploadData.append('clientName', formInline.clientName);
-    // axios.get('/users')
-    //     .then(response => {
-    //         console.log(response)
-    //     })
-    //     .catch(error => {
-    //         console.error(error)
-    //     })
+const onSubmit = async() => {
     //除上传图片，其他为空，则弹框，不请求
     if(formInline.clientName==''||formInline.equipmentName==''||formInline.equipmentId==''||formInline.faultDate==''||formInline.faultPhenomenon==''||formInline.notes==''){
         ElMessageBox.alert('输入不能为空', '提示：', {
@@ -90,15 +82,21 @@ const onSubmit = () => {
                 })
         return;
     }
-
+    const checkresult =  await axiosServer.AxiosPost(formInline, '/Equipment/CheckAndRetrieveQualityDate')
+    console.log('checkresult',checkresult)
+    if(checkresult.success == false){
+        ElMessage.error('添加失败，该设备并未中标！');
+        return 
+    }
     uploadData.append('clientName',formInline.clientName)
     uploadData.append('equipmentName',formInline.equipmentName)
     uploadData.append('equipmentId',formInline.equipmentId)
     uploadData.append('faultDate',formInline.faultDate)
     uploadData.append('faultPhenomenon',formInline.faultPhenomenon)
     uploadData.append('notes',formInline.notes)
-
-
+    uploadData.append('qualityDate',checkresult.result.protectTime)
+    uploadData.append('signforDate',checkresult.result.signforDate)
+    console.log('uploadData',uploadData)
     axios(
         {
             url: '/Equipment/EquipmentSubmit',

@@ -1,5 +1,5 @@
 <template>
-  <div class="common-layout" style="height: 100%;">
+  <div class="common-layout" style="height: 50%;">
     <el-container style="height: 100%;">
       <el-header style="background-color: #f6f8f8; display: flex; align-items: center; ">
         <el-text class="mx-1" size="large">验收信息</el-text>
@@ -69,24 +69,7 @@ const formInline = reactive({
 //const disabled = ref(true)
 var  orderDate  = null
 var clientName = ''
-
 const formInlineCopy = formInline
-const FormDisplay = (data) => {
-  if (data.length != 0) {
-    data = data.pop()
-    if (data.emailName == '') {
-      //disabled.value = false
-    } else {
-      //disabled.value = true
-    }
-    Object.keys(data).forEach((key) => {
-      formInline[key] = data[key];
-    });
-  } else {
-    //disabled.value = false
-    formInline = formInlineCopy
-  }
-}
 
 const onSubmit = () => {
   const formInlineFields = Object.keys(formInline);  
@@ -105,7 +88,7 @@ EventBus.on('slide-ship-order', async (val: any) => {
     orderDate = val.orderDate
     clientName = val.clientName
     axiosServer.AxiosPost(val,'/ShipClient/GetShipAccept').then(res=>{
-      FormDisplay(res)
+      Object.assign(formInline, funBox.FormDisplay(res,formInline,formInlineCopy));
     })
 })
 </script>

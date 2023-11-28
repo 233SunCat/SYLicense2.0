@@ -46,8 +46,6 @@ const formInline = reactive({//这里就是获取的数据
 const onCancel = () => {
   console.log('取消')
 }
-//通信区域
-//接受请求
 
 //发送请求
 

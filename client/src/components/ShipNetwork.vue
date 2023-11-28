@@ -1,5 +1,5 @@
 <template>
-  <div class="common-layout" style="height: 100%;">
+  <div class="common-layout" style="height: 50%;">
     <el-container style="height: 100%;">
       <el-header style="background-color: #f6f8f8; display: flex; align-items: center; ">
         <el-text class="mx-1" size="large">设备联网及质保</el-text>

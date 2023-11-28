@@ -8,6 +8,22 @@ const ShipClient = Mongoose.Schema({
     type: String,
     default: ""
   },
+  clientArea: {//客户地区
+    type: String,
+    default: ""
+  },
+  clientProvince: {//客户省份
+    type: String,
+    default: ""
+  },
+  clientUrban: {//客户市区
+    type: String,
+    default: ""
+  },
+  clientLevel: {//客户医院等级
+    type: String,
+    default: ""
+  },
   orderStatus: {//中标状态
     type: String,
     default: ""
@@ -109,8 +125,8 @@ const ShipClient = Mongoose.Schema({
     default: null
   },
   inventoryStatus:{//是否在库
-    type: String,
-    default: ""
+    type: [String],
+    default: ['']
   },  
   acceptName:{//验收方姓名
     type: String,

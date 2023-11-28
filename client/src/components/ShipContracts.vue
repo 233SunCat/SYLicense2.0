@@ -1,5 +1,5 @@
 <template>
-  <div class="common-layout" style="height: 100%;">
+  <div class="common-layout" style="height: 80%;">
     <el-container style="height: 100%;">
       <el-header style="background-color: #f6f8f8; display: flex; align-items: center; ">
         <el-text class="mx-1" size="large">合同信息</el-text>
@@ -64,12 +64,7 @@
     
 <script lang="ts" setup>
 import { ref, reactive } from "vue";
-import axios from "axios";
 import type { FormProps } from "element-plus";
-import { ElMessage, ElMessageBox } from "element-plus";
-import type { Action } from "element-plus";
-import type { UploadInstance } from "element-plus";
-import type { UploadProps, UploadUserFile } from "element-plus";
 import EventBus from "../assets/common/event-bus"
 import axiosServer from '../assets/common/axios-server'
 import qs from 'qs'; // 引入 qs 库
@@ -78,7 +73,7 @@ import funBox from '../assets/common/fun-box'
 
 const labelPosition = ref<FormProps["labelPosition"]>("right");
   //const disabled = ref(true)
-  var orderDate  = null
+var orderDate  = null
 var clientName = ''
 const formInline = reactive({
   dealer: '', // 代理商信息  
@@ -92,25 +87,8 @@ const formInline = reactive({
   invoiceDate: null, // 开票日期  
   invoiceNumber: '', // 开票编号  
 });
-
-
 const formInlineCopy = formInline
-const FormDisplay = (data) => {
-  if (data.length != 0) {
-    data = data.pop()
-    if (data.emailName == '') {
-      //disabled.value = false
-    } else {
-      //disabled.value = true
-    }
-    Object.keys(data).forEach((key) => {
-      formInline[key] = data[key];
-    });
-  } else {
-    //disabled.value = false
-    formInline = formInlineCopy
-  }
-}
+
 var  orderDate  = null
 var clientName = ''
 const onSubmit = () => {
@@ -131,7 +109,7 @@ EventBus.on('slide-ship-order', async (val: any) => {
     orderDate = val.orderDate
     clientName = val.clientName
     axiosServer.AxiosPost(val,'/ShipClient/GetShipContracts').then(res=>{
-      FormDisplay(res)
+      Object.assign(formInline, funBox.FormDisplay(res,formInline,formInlineCopy));
     })
 })
 </script>

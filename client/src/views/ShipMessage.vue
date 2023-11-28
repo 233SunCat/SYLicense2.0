@@ -5,7 +5,8 @@
         <SlideMenuShip/>
         </el-aside>
         <el-main>
-          <ShipConfigureTraining v-if="shipConfigureTrainingPermission"/>
+          <ShipUserStatus />
+          <ShipConfigureTraining v-if="shipConfigureTrainingPermission" style="margin-top: 30px;"/>
           <ShipNetwork style="margin-top: 30px;"/>
           <ShipReceiving style="margin-top: 30px;"/>
           <ShipEmail style="margin-top: 30px;"/>
@@ -28,6 +29,7 @@
   import ShipInspection from '@/components/ShipInspection.vue'
   import ShipContracts from '@/components/ShipContracts.vue'
   import ShipEvent from '@/components/ShipEvent.vue'
+  import ShipUserStatus from '@/components/ShipUserStatus.vue'
 
   import {ref,provide,onMounted, reactive} from 'vue'
   import EventBus from "../assets/common/event-bus"

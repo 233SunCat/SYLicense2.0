@@ -1,5 +1,5 @@
 <template>
-  <div class="common-layout" style="height: 100%">
+  <div class="common-layout" style="height: 50%">
     <el-container style="height: 100%">
       <el-header style="background-color: #f6f8f8; display: flex; align-items: center">
         <el-text class="mx-1" size="large">收货信息</el-text>
@@ -129,22 +129,6 @@ var formInline = reactive({
   receivingDate: null,
 });
 const formInlineCopy = formInline
-const FormDisplay = (data) => {
-  if (data.length !== 0) {
-    const latestData = data.pop();
-
-    // 根据 receivingName 判断是否禁用
-    //disabled.value = latestData.receivingName === '';
-
-    // 使用 Object.assign 复制属性到 formInline
-    Object.assign(formInline, latestData);
-  } else {
-    //disabled.value = true;
-    // 恢复 formInline 的初始状态
-    Object.assign(formInline, formInlineCopy);
-  }
-};
-
 
 /**
  * 添加
@@ -170,7 +154,7 @@ EventBus.on('slide-ship-order', async (val: any) => {
   clientName = val.clientName
   axiosServer.AxiosPost(val, '/ShipClient/GetShipReceiving').then(res => {//res = [],如果id存在[{}...]，id不存在[]
   console.log('res',res)
-    FormDisplay(res)
+  Object.assign(formInline, funBox.FormDisplay(res,formInline,formInlineCopy));
   })
 })
 </script>

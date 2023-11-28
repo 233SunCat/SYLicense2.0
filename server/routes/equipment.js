@@ -4,6 +4,10 @@ var router = express.Router();
 var cors = require('cors');
 const InsertEquipment = require('../controller/EquipmentController')
 const Fault = require('../model/Equipment'); // 导入你定义的模型  
+const dbController = require('../controller/DBController')
+const orderEquipment = require('../model/ShipEquipment')
+
+
 const multer = require('multer'); // 用于处理 multipart/form-data 类型的数据  
 const storage = multer.diskStorage({
   destination(req, file, cb) {
@@ -15,42 +19,6 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage })
 router.use(cors());
-/* GET users listing. */
-// router.get('/EquipmentSearch', function (req, res, next) {
-//   //查询所有的设备报修数据
-//   res.send('链接服务端成功');
-// });
-
-// router.post('/', (req, res) => {
-//   const data = req.body; // 获取POST请求中的数据  
-//   console.log('11111111111111')
-//   console.log(req.body);
-//   const clientName = req.body.clientName;
-//   // const equipmentName = req.body.equipmentName;
-//   // const equipmentId = req.body.equipmentId;
-//   // const faultDate = req.body.faultDate;
-//   // const faultPhenomenon = req.body.faultPhenomenon;
-//   // const notes = req.body.notes;
-//   const newFault = new Fault({
-//     clientName,
-//     // equipmentName,
-//     // equipmentId,
-//     // faultDate,
-//     // faultPhenomenon,
-//     // notes
-//   });
-//   newFault.save()
-//     .then(() => {
-//       //console.log('Fault saved successfully:', newFault);
-//       res.status(200).send('Fault saved successfully'); // 发送200成功响应 
-//       return;  // 添加这一行，确保之后的代码不会执行  
-//     })
-//     .catch((error) => {
-//       //console.error('Error saving fault:', error);
-//       res.status(500).send('Error saving fault'); // 发送500错误响应  
-//     });
-//   return;  // 添加这一行，确保之后的代码不会执行  
-// });
 
 router.post('/EquipmentSubmit', upload.single('file'), (req, res) => {
   // req.file 是 'file' 文件的信息  
@@ -67,7 +35,8 @@ router.post('/EquipmentSubmit', upload.single('file'), (req, res) => {
   const faultDate = req.body.faultDate;
   const faultPhenomenon = req.body.faultPhenomenon;
   const notes = req.body.notes;
-  const qualityDate = 2;
+  const qualityDate = req.body.qualityDate;
+  const signforDate = req.body.signforDate
   const status = '待维修';
   const newFault = new Fault({
     clientName,
@@ -78,19 +47,19 @@ router.post('/EquipmentSubmit', upload.single('file'), (req, res) => {
     imageVideo,
     notes,
     qualityDate,
-    status
+    status,
+    signforDate
   });
+  console.log('newFault',newFault)
   newFault.save()
     .then(() => {
-      //console.log('Fault saved successfully:', newFault);
       res.status(200).send('Fault saved successfully'); // 发送200成功响应 
-      return;  // 添加这一行，确保之后的代码不会执行  
+      return;
     })
     .catch((error) => {
-      //console.error('Error saving fault:', error);
       res.status(500).send('Error saving fault'); // 发送500错误响应  
     });
-  return;  // 添加这一行，确保之后的代码不会执行  
+  return; 
 });
 router.post('/EquipmentSearch',async(req, res) => {
   //const data = await Fault.find()
@@ -109,7 +78,8 @@ router.post('/EquipmentSearch',async(req, res) => {
     const keywordRegex = new RegExp(req.body.keyword, 'i');  
     query.$or = [  
       { equipmentName: { $regex: keywordRegex } },  
-      { equipmentId: { $regex: keywordRegex } }  
+      { equipmentId: { $regex: keywordRegex } } ,
+      {clientName:{ $regex: keywordRegex }}
     ];  
   }
 
@@ -154,25 +124,20 @@ router.post('/EquipmentDetail/RepairHistory',async(req, res) => {
   }  
 })
 router.post('/EquipmentDetail/RepairSubmit',async(req, res) => {
-  //const data = await Fault.find()
   // 创建查询条件
   const equipmentId = req.body.equipmentId;
-  const repairEngineer = req.body.repairEngineer;
-  const repairTime = req.body.repairTime;
-  const repairLocation = req.body.repairLocation;
-  const repairMoney = req.body.repairMoney;
-  const repairContext = req.body.repairContext;
-  const repairNotes = req.body.repairNotes;
+  var repairHistory = {}
+  repairHistory.repairEngineer = req.body.repairEngineer;
+  repairHistory.repairTime = req.body.repairTime;
+  repairHistory.repairLocation = req.body.repairLocation;
+  repairHistory.repairMoney = req.body.repairMoney;
+  repairHistory.repairContext = req.body.repairContext;
+  repairHistory.repairNotes = req.body.repairNotes;
 
   const status = '已维修';
   const updateFault = {  
     $set: {  
-      repairEngineer,  
-      repairTime,  
-      repairLocation,  
-      repairMoney,  
-      repairContext,  
-      repairNotes, 
+      repairHistory,
       status
     }  
   };  
@@ -186,4 +151,12 @@ router.post('/EquipmentDetail/RepairSubmit',async(req, res) => {
     });
 })
 
+router.post('/CheckAndRetrieveQualityDate',async(req, res) => {
+  const result = await dbController.getProtectTimeByEquipmentId(orderEquipment,req.body.equipmentId);
+  if (result != null) {
+    return res.send({success:true,result:result})
+  } else {
+    return res.send({success:false,result:null})
+  }  
+})
 module.exports = router;

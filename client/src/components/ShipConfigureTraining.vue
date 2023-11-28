@@ -25,7 +25,7 @@
                 <el-dialog v-model="dialogEqAdd" title="添加设备" style="width: 500px;">
                   <el-form-item label="选择设备：">
                     <el-select style="width: 50%" v-model="equipmentSelect" placeholder="请选择设备" clearable>
-                      <el-option v-for="item in selectEquipmentName" :label="item" :value="item" :key="item"/>
+                      <el-option v-for="item in selectEquipmentName" :label="item" :value="item" :key="item" />
                     </el-select>
                   </el-form-item>
                   <el-form-item label="确定">
@@ -51,8 +51,9 @@
                 <el-input style="width: 100%;" v-model="formInline.equipmentNumber" placeholder="设备数量" clearable
                   @input="InputChange(formInline.equipmentNumber)" :disabled="netDisabled" />
               </el-form-item>
-              <el-form-item label="设备编号：" v-for="item,index in formInline.equipmentIds" :key="index">
-                <el-input style="width: 100%;" v-model="formInline.equipmentIds[index]" :key="index" clearable :disabled="netDisabled"/>
+              <el-form-item label="设备编号：" v-for="item, index in formInline.equipmentIds" :key="index">
+                <el-input style="width: 100%;" v-model="formInline.equipmentIds[index]" :key="index" clearable
+                  :disabled="netDisabled" />
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click="EquipmentSubmit" :disabled="netDisabled">确认保存</el-button>
@@ -63,12 +64,29 @@
           <el-col :span="12">
             <div class="grid-content ep-bg-purple" />
             <el-timeline>
-              <el-timeline-item v-for="index in activities" :key="index.buttonText" :timestamp="index.context">
-                <el-button type="primary" plain>{{ index.buttonText }}</el-button>
+              <el-timeline-item>
+                <el-button type="primary" plain @click="DownloadExe">下载生成工具</el-button>
               </el-timeline-item>
-              <el-dialog v-model="dialogFormVisible" title="维修记录">
+              <el-timeline-item>
+                <el-upload v-model:file-list="fileList" class="upload-demo"
+                  action="http://localhost:3000/DownloadAndUpload/tenpinfo" :on-change="handleChange">
+                  <el-button type="primary" plain>上传tenpinfo文件</el-button>
+                  <template #tip>
+                    <div class="el-upload__tip">
+                      管理员权限运行exe文件后,上传tenpinfo文件
+                    </div>
+                  </template>
+                </el-upload>
+              </el-timeline-item>
+              <el-timeline-item>
+                <el-button type="primary" plain @click="ConfigurationModule">配置训练模块</el-button>
+                <el-dialog v-model="dialogFormVisible" title="维修记录">
                 <ConfigureTrainingApply />
               </el-dialog>
+              </el-timeline-item>
+              <el-timeline-item>
+                <el-button type="primary" plain @click="DownloadModule">下载配置模块</el-button>
+              </el-timeline-item>
             </el-timeline>
           </el-col>
         </el-row>
@@ -85,7 +103,14 @@ import EventBus from "../assets/common/event-bus"
 import axiosServer from '../assets/common/axios-server'
 import qs from 'qs'; // 引入 qs 库
 import messageBox from '../assets/common/message-box'
+import { ElMessage } from 'element-plus';
+
 import * as constants from '../constants.json';
+import axios from 'axios';
+import type { UploadProps, UploadUserFile } from 'element-plus'
+import type { UploadInstance } from 'element-plus'
+const uploadRef = ref<UploadInstance>()
+
 
 const selectEquipmentName = constants.selectEquipmentName
 var dialogFormVisible = ref(false)
@@ -104,7 +129,7 @@ type Equipment = {
   equipmentNumber: number;
 };
 interface FormInlineData {
-  equipmentNames:  Equipment[];
+  equipmentNames: Equipment[];
   equipmentStyle: string;
   equipmentNumber: string;
   equipmentIds: string[];
@@ -126,27 +151,10 @@ const formInline = reactive<FormInlineData>({//这里就是获取的数据
   orderStatus: ''
 })
 
-const activities = [
-  {
-    buttonText: '下载生成工具',
-    context: '下载生成工具',
-  },
-  {
-    buttonText: '上传tenpinfo文件',
-    context: '以管理员身份运行',
-  },
-  {
-    buttonText: '配置训练模块',
-    context: '文件成功上传后',
-  },
-  {
-    buttonText: '下载配置模块',
-    context: '',
-  },
-]
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
 const cities = constants.Module
+
 /**
  * 
  * 输入框触发
@@ -157,7 +165,7 @@ const InputChange = (num: any) => {
 /**
  * 输入框清零
  */
- const InputClean = () => {
+const InputClean = () => {
   formInline.equipmentIds = []
   formInline.equipmentModule = []
   formInline.equipmentStyle = ''
@@ -172,8 +180,52 @@ const handleCheckedCitiesChange = (value: string[]) => {
   checkAll.value = checkedCount === cities.length
   isIndeterminate.value = checkedCount > 0 && checkedCount < cities.length
 }
-const generateNewEquipmentInfo = (name) =>{
-    return {
+/**
+ * 下载工具
+ */
+const DownloadExe = async () => {
+  try {
+    const response = await axios({
+      method: 'get',
+      url: '/DownloadAndUpload/SYGenInfo', // 替换为实际路由
+      responseType: 'blob', // 重要：responseType必须是'blob'以处理二进制数据
+    });
+
+    // 从二进制数据创建blob
+    const blob = new Blob([response.data], { type: 'application/octet-stream' });
+
+    // 创建链接元素并触发下载
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = 'SYGenInfo.exe'; // 替换为所需的文件名
+    link.click();
+  } catch (error) {
+    console.error('下载文件时出错：', error);
+  }
+}
+/**
+ * 上传文件
+ */
+ const fileList = ref<UploadUserFile[]>([])
+const handleChange = async (file, fileList) => {
+  //fileList.value = fileList.value.slice(-3)
+  // 处理上传结果
+  if (file.status === 'success') {
+    // 显示上传成功的提示
+    ElMessage.success('文件 上传成功!');
+  } else if (file.status === 'error') {
+    // 显示上传失败的提示
+    ElMessage.error('文件 上传失败，请重试或联系管理员!');
+  }
+};
+/**
+ * 配置训练模块
+ */
+const ConfigurationModule = () => {
+  dialogFormVisible.value = true;
+}
+const generateNewEquipmentInfo = (name) => {
+  return {
     equipmentName: name,
     equipmentModule: [],
     equipmentStyle: "",
@@ -228,7 +280,7 @@ const processEquipmentButton = (data) => {//生成动态按钮
   formInline.equipmentNames = data.filter(item => item.equipmentIds.length !== 1 || item.equipmentIds[0] !== '');
 }
 const formMap = (result) => {
-    return result.map(item => ({equipmentName:item.equipmentName, equipmentModule:item.equipmentModule,equipmentStyle:item.equipmentStyle, equipmentId:item.equipmentId}))
+  return result.map(item => ({ equipmentName: item.equipmentName, equipmentModule: item.equipmentModule, equipmentStyle: item.equipmentStyle, equipmentId: item.equipmentId }))
 }
 const NetDisable = () => {//组件-禁止输入
   netDisabled.value = true;
@@ -258,28 +310,28 @@ const EquipmentAdd = () => {//触发事件-增加设备
  * 保存设备信息
  */
 const EquipmentSubmit = () => {//保存失败弹框
-  console.log('formInline',formInline)
+  console.log('formInline', formInline)
   const { equipmentNames, ...newfornInline } = formInline;
   //发送请求.
   axiosServer.AxiosPost(qs.stringify(newfornInline), '/ShipClient/AddShipEquipment').then(res => {
-      if(res.success == true){
+    if (res.success == true) {
 
-            messageBox.MessageBox('保存成功')
-        }else{
-            messageBox.MessageBox('保存失败')
-        }
+      messageBox.MessageBox('保存成功')
+    } else {
+      messageBox.MessageBox('保存失败')
+    }
   })
 }
 /**
  * 查看单类型设备信息
  * @param item 
  */
- const HandleFormSearch = (item) => {//内存表单查询
+const HandleFormSearch = (item) => {//内存表单查询
   formInline.equipmentIds = []
   formInline.equipmentNumber = item.equipmentNumber
   formInline.equipmentStyle = item.equipmentStyle
   formInline.equipmentModule = item.equipmentModule
-  item.equipmentIds.forEach((res,index) => {
+  item.equipmentIds.forEach((res, index) => {
     formInline.equipmentIds.push(res)
   })
   NetDisable();
@@ -289,16 +341,16 @@ const EquipmentSubmit = () => {//保存失败弹框
  * 直接加载
  */
 EventBus.on('slide-ship-order', async (val: any) => {
-    NetDisable();
-    console.log('val',val)
-    formInline.clientName = val.clientName
-    formInline.orderDate = val.orderDate
-    formInline.orderStatus = val.orderStatus
-    axiosServer.AxiosPost(val,'/ShipClient/GetShipEquipmentNames').then(res=>{//res = [],如果id存在[{}...]，id不存在[]
-      const data = formMap(res)
-      const formData =  processEquipmentData(data)
-      processEquipmentButton(formData)
-    })
+  NetDisable();
+  console.log('val', val)
+  formInline.clientName = val.clientName
+  formInline.orderDate = val.orderDate
+  formInline.orderStatus = val.orderStatus
+  axiosServer.AxiosPost(val, '/ShipClient/GetShipEquipmentNames').then(res => {//res = [],如果id存在[{}...]，id不存在[]
+    const data = formMap(res)
+    const formData = processEquipmentData(data)
+    processEquipmentButton(formData)
+  })
 })
 </script>
   

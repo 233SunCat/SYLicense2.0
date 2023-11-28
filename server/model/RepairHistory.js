@@ -13,11 +13,9 @@ const EquipmentSchema = Mongoose.Schema({
         type: String,
         default: ""
     },
-    qualityDate: {
+    repairStatus:{
         type: String,
-    },
-    signforDate: {//签收时间
-        type: Date,
+        default: ''
     },
     faultDate: {
         type: Date,
@@ -26,24 +24,36 @@ const EquipmentSchema = Mongoose.Schema({
         type: String,
         default: ''
     },
-    status: {
+    imageVideo:{//故障图片
         type: String,
         default: ''
     },
-    operation: {
-        type: String,
-        default: ''
-    },
-    notes:{
-        type: String,
-        default: ''
-    },
-}
-);
-  
-  
-const Fault = Mongoose.model('Equipment', EquipmentSchema);  
 
-// console.log(Fault)
-// module.exports = Fault;
-module.exports = Fault;
+    repairEngineer:{//维修人
+        type: String,
+        default: ''
+    },
+    repairDate:{//维修时间
+        type: Date,
+    },
+    repairLocation:{//维修地址
+        type: String,
+        default: ''
+    },
+    repairWay:{//维修方式
+        type: String,
+        default: ''
+    },
+    repairMoney:{//维修成本
+        type: Number,
+        default: 0
+    },
+    repairContext:{//维修内容
+        type: String,
+        default: ''
+    },
+    repairNotes:{//维修备注
+        type: String,
+        default: ''
+    },
+});

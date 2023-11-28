@@ -13,7 +13,7 @@
       </el-col>
       <el-col :span="1"> </el-col>
       <el-col :span="3">
-        <el-date-picker  v-model="startDate" type="date" placeholder="选择起始日期">
+        <el-date-picker v-model="startDate" type="date" placeholder="选择起始日期">
         </el-date-picker>
       </el-col>
       <el-col :span="1"> </el-col>
@@ -39,7 +39,8 @@
       <el-table-column prop="equipmentId" label="设备编号"></el-table-column>
       <el-table-column prop="clientName" label="用户/样机名称"></el-table-column>
       <el-table-column prop="qualityDate" label="质保期"></el-table-column>
-      <el-table-column prop="qualityDate" label="质保剩余时间"></el-table-column>
+      <el-table-column prop="signforDate" label="签收时间"></el-table-column>
+      <el-table-column prop="qualityDateLast" label="质保剩余时间"></el-table-column>
       <el-table-column prop="faultDate" label="故障时间"></el-table-column>
       <el-table-column prop="faultPhenomenon" label="故障现象"></el-table-column>
       <el-table-column prop="status" label="状态"></el-table-column>
@@ -64,6 +65,7 @@ import { ElButton } from "element-plus";
 import XLSX from "xlsx";
 import { useRouter } from "vue-router";
 import axios from "axios";
+import dayjs from 'dayjs'
 
 // 定义数据
 const keyword = ref("");
@@ -98,6 +100,16 @@ const dataSearch = () => {
       //确认保存后，即使清空
       tableData.value = res.data.map(item => {
         item.faultDate = new Date(item.faultDate).toLocaleDateString();
+        // 假设 qualityDate 和 signforDate 都是日期对象
+        var signforDate = new Date(item.signforDate);
+        // 计算质保剩余时间
+        const currentTime = new Date(); // 现在的时间
+        const timeDifference = currentTime.getTime() - signforDate.getTime();
+        // 将剩余时间转换为天数（或其他你需要的时间单位）
+        const remainingDays = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+        item.signforDate = new Date(item.signforDate).toLocaleDateString();
+        // 将结果赋值给 qualityDateLast
+        item.qualityDateLast = item.qualityDate - remainingDays; 
         return item;
       });
     }
@@ -136,7 +148,12 @@ const handleRowClick = (row: any) => {
       const data = res.data[0];
       router.push({
         path: '/Equipment/EquipmentDetail',
-        query: { faultDate: data.faultDate, faultPhenomenon: data.faultPhenomenon, notes: data.notes , equipmentId: row.equipmentId}
+        query: {
+          faultDate: data.faultDate, faultPhenomenon: data.faultPhenomenon, notes: data.notes, equipmentId: row.equipmentId,
+          clientName: row.clientName, qualityDate: row.qualityDate,equipmentName:row.equipmentName,
+          status:row.status,signforDate: row.signforDate,
+          imageVideo:data.imageVideo
+        }
         // 多个参数这样的写法
         // query:{Shuju}
       })

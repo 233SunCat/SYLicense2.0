@@ -1,16 +1,16 @@
 <template style="height:100%;">
   <div style="height: 100%; width: 100%">
     <div style="display: flex; justify-content: center">
-      <el-text class="mx-1" style="font-size: 20px">力反馈腹腔镜</el-text>
-      <el-tag style="margin: 10px">在保</el-tag>
+      <el-text class="mx-1" style="font-size: 20px">{{ equipmentName }}</el-text>
+      <el-tag style="margin: 10px">{{ qualiyStatus }}</el-tag>
       <br />
-      <el-tag style="margin: 10px" class="ml-2" type="warning">已维修</el-tag>
+      <el-tag style="margin: 10px" class="ml-2" type="warning">{{ status }}</el-tag>
     </div>
     <div style="height: 8%; display: flex; justify-content: center">
-      <el-tag class="ml-2" type="info">用户-苏州人民医院</el-tag>
-      <el-tag class="ml-2" type="info">设备编号- TTS</el-tag>
-      <el-tag class="ml-2" type="info">质保期- 3年</el-tag>
-      <el-tag class="ml-2" type="info">剩余质保期- 1年</el-tag>
+      <el-tag class="ml-2" type="info">用户名称：{{ clientName }}</el-tag>
+      <el-tag class="ml-2" type="info">设备编号：{{ equipmentId }}</el-tag>
+      <el-tag class="ml-2" type="info">质保期：{{ qualityDate }}</el-tag>
+      <el-tag class="ml-2" type="info">剩余质保期：{{ qualityDateLast }}</el-tag>
     </div>
     <div>
       <div style="display: flex; justify-content: center">
@@ -43,8 +43,10 @@
                   <el-input v-model="form.repairLocation" autocomplete="off" class="dialog-inputs" />
                 </el-form-item>
                 <el-form-item label="维修方式：">
-                  <el-checkbox v-model="form.checked1" label="现场维修" />
-                  <el-checkbox v-model="form.checked2" label="无法维修，设备返厂" />
+                  <el-radio-group v-model="repairStatus" class="ml-4">
+                    <el-radio label="现场维修" size="large">现场维修</el-radio>
+                    <el-radio label="待维修" size="large">无法维修，返厂</el-radio>
+                  </el-radio-group>
                 </el-form-item>
                 <el-form-item label="维修成本：" :label-width="formLabelWidth">
                   <el-input v-model="form.repairMoney" autocomplete="off" class="dialog-inputs" />
@@ -110,55 +112,61 @@ import type { FormProps } from "element-plus";
 import { useRouter, useRoute } from 'vue-router';
 import axios from "axios";
 import { ElMessage, ElMessageBox } from 'element-plus'
-
-const checked1 = ref(false)
-const checked2 = ref(false)
+import dayjs from 'dayjs'
+ 
+const  repairStatus = ref('现场维修')
 
 const route = useRoute();
 const startDate = ref(new Date());
 const endDate = ref(new Date());
 const labelPosition = ref<FormProps["labelPosition"]>("right");
-const inputDate =  ref(route.query.faultDate);
+const inputDate = ref(dayjs(route.query.faultDate).format("YYYY-MM-DD"));
+const faultDate = route.query.faultDate
+const faultPhenomenon = route.query.faultPhenomenon
 const inputPhenomenon = ref(route.query.faultPhenomenon);
 const inputNotes = ref(route.query.notes);
-const equipmentId = ref(route.query.equipmentId)
+const clientName = route.query.clientName
+const equipmentId = route.query.equipmentId
+const qualityDate = ref(route.query.qualityDate)
+const status = ref(route.query.status)
+// 假设 qualityDate 和 signforDate 都是日期对象
+var signforDate = new Date(route.query.signforDate);
+// 计算质保剩余时间
+const currentTime = new Date(); // 现在的时间
+const timeDifference = currentTime.getTime() - signforDate.getTime();
+// 将剩余时间转换为天数（或其他你需要的时间单位）
+const remainingDays = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+// 将结果赋值给 qualityDateLast
+const qualityDateLast = ref(qualityDate.value - remainingDays)
+var qualiyStatus = ref('')
+if (qualityDateLast.value > 0) {
+  qualiyStatus.value = "在保"
+} else {
+  qualiyStatus.value = "过保"
+}
+const equipmentName = route.query.equipmentName
+const imageVideo = route.query.imageVideo
 // 其他表格数据...
 const tableData = ref([]);
 const dialogFormVisible = ref(false)
 const formLabelWidth = '140px'
 const form = reactive({
+  equipmentName: equipmentName,
   equipmentId: equipmentId,
+  clientName: clientName,
+  faultDate: faultDate,
+  faultPhenomenon: faultPhenomenon,
+  imageVideo,
   repairEngineer: '',
   repairTime: '',
   repairLocation: '',
   repairMoney: '',
   repairContext: '',
   repairNotes: '',
-  checked1: false,
-  checked2: false
+  repairStatus: repairStatus.value
 })
 
-
 var searchData = new FormData();
-
-//历史已维修查询
-// axios({
-//   url: "/Equipment/EquipmentDetail",
-//   data: searchData,
-//   method: "post",
-//   headers: {
-//     "Content-Type": "application/x-www-form-urlencoded",
-//   },
-// }).then((res) => {
-//   if (res.status == 200) {
-//     //确认保存后，即使清空
-//     tableData.value = res.data.map(item => {
-//       item.inputDate = new Date(item.inputDate).toLocaleDateString();
-//       return item;
-//     });
-//   }
-// });
-
 //查询条件
 const dataSearch = () => {
 
@@ -182,7 +190,9 @@ const dataSearch = () => {
 }
 
 //维修登记
-const RepairSubmit=()=>{
+const RepairSubmit = () => {
+  console.log('form', form)
+  return
   axios({
     url: "/Equipment/EquipmentDetail/RepairSubmit",
     data: form,
@@ -195,8 +205,8 @@ const RepairSubmit=()=>{
       //确认保存后，即使清空
       console.log(res.data)
       ElMessageBox.alert('保存成功', '提示：', {
-                    confirmButtonText: '确认',
-                })
+        confirmButtonText: '确认',
+      })
     }
   });
 }

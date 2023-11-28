@@ -1,5 +1,5 @@
 <template>
-  <div class="common-layout" style="height: 100%;">
+  <div class="common-layout" style="height: 50%;">
     <el-container style="height: 100%;">
       <el-header style="background-color: #f6f8f8; display: flex; align-items: center; ">
         <el-text class="mx-1" size="large">签收信息</el-text>
@@ -28,7 +28,7 @@
               <el-date-picker style="width: 100%" v-model="formInline.signforDate" type="date" clearable  :disabled="disabled"/>
             </el-form-item>
             <el-form-item label="是否在库">
-              <el-checkbox-group v-model="inventoryStatus" @change="handleinventoryStatusChange"  :disabled="disabled">
+              <el-checkbox-group v-model="formInline.inventoryStatus" :disabled="disabled">
                 <el-checkbox v-for="city in cities" :key="city" :label="city">{{
                   city
                 }}</el-checkbox>
@@ -48,7 +48,6 @@
 import { ref, reactive } from "vue";
 import axios from "axios";
 import type { FormProps } from "element-plus";
-import { ElMessageBox } from "element-plus";
 import EventBus from "../assets/common/event-bus"
 import axiosServer from '../assets/common/axios-server'
 import qs from 'qs'; // 引入 qs 库
@@ -65,39 +64,21 @@ const formInline = reactive({
   signforName: "",
   signforPhone: "",
   signforDate: null,
+  inventoryStatus:['是']
 
 });
-var inventoryStatus = ref(['是'])
 var cities = ['是', '否']
 var status = 1;
 
-
 const change = () => {//判断是否在库
-  if (inventoryStatus.value.length == 0 || inventoryStatus.value.length == 2) {
+  if (formInline.inventoryStatus.length == 0 || formInline.inventoryStatus.length == 2) {
     status = 0;
     messageBox.MessageBox("错误只能单选")
     return;
   }
 }
-
 const formInlineCopy = formInline
-const FormDisplay = (data) => {
-  if (data.length != 0) {
-    data = data.pop()
-    if (data.emailName == '') {
-      //disabled.value = false
-    } else {
-      //disabled.value = true
-    }
-    inventoryStatus.value = [data.inventoryStatus]
-    Object.keys(data).forEach((key) => {
-      formInline[key] = data[key];
-    });
-  } else {
-    //disabled.value = false
-    formInline = formInlineCopy
-  }
-}
+
 var  orderDate  = null
 var clientName = ''
 const onSubmit = () => {
@@ -106,7 +87,7 @@ const onSubmit = () => {
   if (status == 0) {
     return;
   } else {
-    formInline.inventoryStatus = inventoryStatus.value[0];
+    formInline.formInline.inventoryStatus = formInline.inventoryStatus.value[0];
   }
   const formInlineFields = Object.keys(formInline);  
   if(funBox.checkRequiredFields(formInline, formInlineFields)){return}
@@ -124,7 +105,7 @@ EventBus.on('slide-ship-order', async (val: any) => {
     orderDate = val.orderDate
     clientName = val.clientName
     axiosServer.AxiosPost(val,'/ShipClient/GetSignfor').then(res=>{
-      FormDisplay(res)
+      Object.assign(formInline, funBox.FormDisplay(res,formInline,formInlineCopy));
     })
 })
 </script>

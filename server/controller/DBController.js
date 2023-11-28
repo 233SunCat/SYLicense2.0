@@ -175,10 +175,30 @@ async function GetCollectionsByKeywordAndDate (dbController, keyword,keywordFiel
 
     return result = await dbController.find(dynamicConditions);
 }
+/**
+ * 判断id的值是否存在，存在返回质保期
+ */
+async function getProtectTimeByEquipmentId(dbController,equipmentId) {
+  try {
+    const equipment = await dbController.findOne({ equipmentId });
+
+    if (equipment) {
+      const protectTime = equipment.protectTime;
+      const signforDate = equipment.signforDate
+      return {protectTime,signforDate};
+    } else {
+      return null; // 如果设备不存在，可以返回 null 或者其他适当的值
+    }
+  } catch (error) {
+    console.error('Error getting protectTime by equipmentId:', error);
+    return null; // 出现错误也返回 null
+  }
+}
 module.exports = { CreateInsert, Update,GetCollectionsByCondition, Delete, 
   GetCollections, UpdateNetwork, 
   GetDataByfieldNameAndfieldValues,
   UpdateCollectionsByCollections,
   GetCollectionsByCollections,
   GetCollectionsByDateRange,
-  GetCollectionsByKeywordAndDate};
+  GetCollectionsByKeywordAndDate,
+  getProtectTimeByEquipmentId};

@@ -88,6 +88,34 @@ router.post('/GetShipEmailiByOrderDateAndClientName', async function (req, res, 
   }))
 })
 /**
+ * 发货用户信息查询
+ */
+router.post('/GetShipUserStatus', async function (req, res, next) {
+  //req.body { clientName: '苏州医院', orderDate: '2020-10-16T00:00:00.000Z' }
+  const query = req.body
+  var result = await dbController.GetCollectionsByCollections(orderEquipment, query)
+  res.send(result)
+})
+/**
+ * 发货用户信息增加
+ */
+router.post('/AddShipUserStatus', async function (req, res, next) {
+  const query = { clientName: req.body.clientName, orderDate: req.body.orderDate };
+  delete req.body.clientName
+  delete req.body.orderDate
+  const update = req.body
+  try {
+    const result = await dbController.UpdateCollectionsByCollections(orderEquipment, query, update);
+    console.log('AddShipUserStatus result:', result);
+    // 根据需要处理 result
+    return res.json(result);
+  } catch (error) {
+    console.error('AddShipUserStatus error:', error);
+    return res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
+});
+/**
+/**
  * 设备名称查询
  */
 router.post('/GetShipEquipmentNames', async function (req, res, next) {
@@ -223,6 +251,7 @@ router.post('/GetSignfor', async function (req, res, next) {
     signforDate: item.signforDate,
     inventoryStatus: item.inventoryStatus
   }))
+  console.log('签收单',result)
   res.send(result)
 })
 /**
