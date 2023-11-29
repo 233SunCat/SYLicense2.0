@@ -46,10 +46,6 @@
       <el-table-column prop="status" label="状态"></el-table-column>
       <el-table-column prop="operation" label="操作">
         <template #default="scope">
-          <!-- 按钮，点击后跳转到其他页面 -->
-          <!-- <router-link style="  text-decoration: none;" to="/Equipment/EquipmentDetail">
-            <el-button type="success" plain @click="handleRowClick(scope.row)">查看详情</el-button>
-            </router-link> -->
           <el-button type="success" plain @click="handleRowClick(scope.row)">查看详情</el-button>
         </template>
       </el-table-column>
@@ -144,6 +140,7 @@ const handleRowClick = (row: any) => {
       "Content-Type": "application/x-www-form-urlencoded",
     },
   }).then((res) => {
+    console.log('跳转res',res)
     if (res.status != 500 && res.data) {
       const data = res.data[0];
       router.push({

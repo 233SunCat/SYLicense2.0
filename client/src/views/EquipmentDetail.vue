@@ -37,15 +37,15 @@
                   <el-input v-model="form.repairEngineer" autocomplete="off" class="dialog-inputs" />
                 </el-form-item>
                 <el-form-item label="维修时间：" :label-width="formLabelWidth">
-                  <el-date-picker v-model="form.repairTime" type="date" placeholder="选择维修时间" class="dialog-inputs">
+                  <el-date-picker v-model="form.repairDate" type="date" placeholder="选择维修时间" class="dialog-inputs">
                   </el-date-picker> </el-form-item>
                 <el-form-item label="维修地点：" :label-width="formLabelWidth">
                   <el-input v-model="form.repairLocation" autocomplete="off" class="dialog-inputs" />
                 </el-form-item>
                 <el-form-item label="维修方式：">
-                  <el-radio-group v-model="repairStatus" class="ml-4">
+                  <el-radio-group v-model="form.repairWay" class="ml-4">
                     <el-radio label="现场维修" size="large">现场维修</el-radio>
-                    <el-radio label="待维修" size="large">无法维修，返厂</el-radio>
+                    <el-radio label="返厂" size="large">无法维修，返厂</el-radio>
                   </el-radio-group>
                 </el-form-item>
                 <el-form-item label="维修成本：" :label-width="formLabelWidth">
@@ -89,19 +89,35 @@
         </el-col>
       </el-row>
       <el-table :data="tableData">
-        <el-table-column prop="name" label="序号"></el-table-column>
-        <el-table-column prop="deviceName" label="状态"></el-table-column>
+        <el-table-column prop="repairStatus" label="状态"></el-table-column>
         <el-table-column prop="faultDate" label="故障时间"></el-table-column>
-        <el-table-column prop="failurePhenomenon" label="故障现象"></el-table-column>
-        <el-table-column prop="warrantyPeriod" label="故障图片"></el-table-column>
-        <el-table-column prop="remainingWarranty" label="维修人"></el-table-column>
-        <el-table-column prop="failureTime" label="维修时间"></el-table-column>
-        <el-table-column prop="failurePhenomenon" label="维修地点"></el-table-column>
-        <el-table-column prop="status" label="维修方式"></el-table-column>
-        <el-table-column prop="operation" label="维修成本/元"></el-table-column>
-        <el-table-column prop="operation" label="维修内容"></el-table-column>
-        <el-table-column prop="operation" label="备注"></el-table-column>
+        <el-table-column prop="faultPhenomenon" label="故障现象"></el-table-column>
+        <el-table-column prop="imageVideo" label="故障图片">
+          <template #default="scope">
+            <el-button type="success" plain @click="handleImageClick(scope.row)">图片详情</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column prop="repairEngineer" label="维修人"></el-table-column>
+        <el-table-column prop="repairDate" label="维修时间"></el-table-column>
+        <el-table-column prop="repairLocation" label="维修地点"></el-table-column>
+        <el-table-column prop="repairWay" label="维修方式"></el-table-column>
+        <el-table-column prop="repairMoney" label="维修成本/元"></el-table-column>
+        <el-table-column prop="repairContext" label="维修内容"></el-table-column>
+        <el-table-column prop="repairNotes" label="备注"></el-table-column>
       </el-table>
+      <el-dialog v-model="dialogImageVisible" title="维修记录">
+        <div class="demo-image">
+          <div v-for="url,index in imageUrls" :key="index" class="block">
+            <span class="demonstration">{{ index }}</span>
+            <el-image style="width: 100px; height: 100px" :src="url" :fit="index" :preview-src-list="[url]"/>
+          </div>
+        </div>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button type="primary" @click="handleImageCancel">确定</el-button>
+          </span>
+        </template>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -113,9 +129,11 @@ import { useRouter, useRoute } from 'vue-router';
 import axios from "axios";
 import { ElMessage, ElMessageBox } from 'element-plus'
 import dayjs from 'dayjs'
- 
-const  repairStatus = ref('现场维修')
+import axiosServer from '../assets/common/axios-server'
+import messageBox from '../assets/common/message-box'
+import qs from 'qs'; // 引入 qs 库
 
+const dialogImageVisible = ref(false)
 const route = useRoute();
 const startDate = ref(new Date());
 const endDate = ref(new Date());
@@ -156,23 +174,37 @@ const form = reactive({
   clientName: clientName,
   faultDate: faultDate,
   faultPhenomenon: faultPhenomenon,
-  imageVideo,
+  imageVideo: imageVideo,
   repairEngineer: '',
-  repairTime: '',
+  repairDate: Date(),
   repairLocation: '',
   repairMoney: '',
   repairContext: '',
   repairNotes: '',
-  repairStatus: repairStatus.value
+  repairWay: '现场维修'
 })
+var url = ref('')
+const fits = ['fill', 'contain', 'cover', 'none', 'scale-down']
+var imageUrls = ref([])
+const handleImageClick = (row: any) => {
+  dialogImageVisible.value = true
+  const imageVideo = row.imageVideo
+  // url.value = 'http://localhost:3000/DownloadAndUpload/faultImage/' + imageVideo
+  // dialogImageVisible.value = true
+  imageUrls = imageVideo.map((fileName: string) => {
+    return 'http://localhost:3000/DownloadAndUpload/faultImage/' + fileName;
+  });
+}
 
-var searchData = new FormData();
+const handleImageCancel = () => {
+  dialogImageVisible.value = false
+}
+
 //查询条件
 const dataSearch = () => {
-
-  const searchData = { startDate: startDate.value, endDate: endDate.value }
+  const searchData = { startDate: startDate.value, endDate: endDate.value, equipmentId: equipmentId }
   axios({
-    url: "/Equipment/EquipmentDetail/RepairHistory",
+    url: "/Equipment/EquipmentDetail/RepairSearch",
     data: searchData,
     method: "post",
     headers: {
@@ -182,7 +214,8 @@ const dataSearch = () => {
     if (res.status == 200) {
       //确认保存后，即使清空
       tableData.value = res.data.map(item => {
-        item.faultDate = new Date(item.faultDate).toLocaleDateString();
+        item.repairDate = new Date(item.repairDate).toLocaleDateString()
+        item.faultDate = new Date(item.faultDate).toLocaleDateString()
         return item;
       });
     }
@@ -191,27 +224,17 @@ const dataSearch = () => {
 
 //维修登记
 const RepairSubmit = () => {
-  console.log('form', form)
-  return
-  axios({
-    url: "/Equipment/EquipmentDetail/RepairSubmit",
-    data: form,
-    method: "post",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  }).then((res) => {
-    if (res.status == 200) {
-      //确认保存后，即使清空
-      console.log(res.data)
-      ElMessageBox.alert('保存成功', '提示：', {
-        confirmButtonText: '确认',
-      })
+  axiosServer.AxiosPost(qs.stringify(form), '/Equipment/EquipmentDetail/RepairSubmit').then(res => {
+    if (res.success == true) {
+      messageBox.MessageBox('保存成功')
+      dialogFormVisible.value = false
+    } else {
+      messageBox.MessageBox('保存失败')
     }
-  });
+  })
 }
 </script>
-<style lang="less">
+<style lang="less" scoped>
 html,
 body,
 #app {
@@ -241,6 +264,24 @@ body,
 }
 
 .dialog-inputs {
+  margin-bottom: 20px;
+}
+.demo-image .block {
+  padding: 30px 0;
+  text-align: center;
+  border-right: solid 1px var(--el-border-color);
+  display: inline-block;
+  width: 20%;
+  box-sizing: border-box;
+  vertical-align: top;
+}
+.demo-image .block:last-child {
+  border-right: none;
+}
+.demo-image .demonstration {
+  display: block;
+  color: var(--el-text-color-secondary);
+  font-size: 14px;
   margin-bottom: 20px;
 }
 </style>

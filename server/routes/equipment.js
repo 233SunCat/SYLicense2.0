@@ -14,53 +14,60 @@ const storage = multer.diskStorage({
     cb(null, './uploads')
   },
   filename(req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname)
+    cb(null,  file.originalname)
   }
 })
 const upload = multer({ storage })
 router.use(cors());
 
-router.post('/EquipmentSubmit', upload.single('file'), (req, res) => {
-  // req.file 是 'file' 文件的信息  
-  // req.body 将包含文本域的数据，如果有的话  
-  //res.send(req.file);
-  var imageVideo = '';
-  if (req.file && req.file.path) {
-    imageVideo = req.file.path;
-    // 其他使用imageVideo的代码  
+router.post('/EquipmentSubmit', upload.array('files', 5), async (req, res) => {
+  try {
+    const equipmentId = req.body.equipmentId;
+    const clientName = req.body.clientName;
+    const equipmentName = req.body.equipmentName;
+    const faultDate = req.body.faultDate;
+    const faultPhenomenon = req.body.faultPhenomenon;
+    const notes = req.body.notes;
+    const qualityDate = req.body.qualityDate;
+    const signforDate = req.body.signforDate;
+    const status = '待维修';
+
+    // 处理上传的文件
+    const files = req.files;
+    const filePaths = files.map(file => file.path);
+    const imageVideo = filePaths;
+
+    // 使用updateOne方法，根据equipmentId进行更新或插入
+    const result = await Fault.updateOne(
+      { equipmentId: equipmentId },
+      {
+        $set: {
+          clientName,
+          equipmentName,
+          faultDate,
+          faultPhenomenon,
+          notes,
+          qualityDate,
+          signforDate,
+          status,
+          imageVideo,
+        },
+      },
+      { upsert: true } // 设置upsert为true，表示如果找不到匹配的记录，就插入一条新的记录
+    );
+      if (result.modifiedCount > 0) {
+        res.send({ success: true });
+      } else {
+        res.send({ success: false, message: 'Update failed or no matching document found.' });
+      }
+  } catch (error) {
+    console.error(error);
+    res.send({ success: false, error: error.message });
   }
-  const clientName = req.body.clientName;
-  const equipmentName = req.body.equipmentName;
-  const equipmentId = req.body.equipmentId;
-  const faultDate = req.body.faultDate;
-  const faultPhenomenon = req.body.faultPhenomenon;
-  const notes = req.body.notes;
-  const qualityDate = req.body.qualityDate;
-  const signforDate = req.body.signforDate
-  const status = '待维修';
-  const newFault = new Fault({
-    clientName,
-    equipmentName,
-    equipmentId,
-    faultDate,
-    faultPhenomenon,
-    imageVideo,
-    notes,
-    qualityDate,
-    status,
-    signforDate
-  });
-  console.log('newFault',newFault)
-  newFault.save()
-    .then(() => {
-      res.status(200).send('Fault saved successfully'); // 发送200成功响应 
-      return;
-    })
-    .catch((error) => {
-      res.status(500).send('Error saving fault'); // 发送500错误响应  
-    });
-  return; 
 });
+
+
+
 router.post('/EquipmentSearch',async(req, res) => {
   //const data = await Fault.find()
   // 创建查询条件
@@ -104,52 +111,84 @@ router.post('/EquipmentDetail',async(req, res) => {
     res.status(500).send('查询数据出错');  
   }  
 })
+const getRepairHistoryBetweenDates = async (equipmentId, startDate, endDate) => {
+  try {
+    const equipment = await Fault.findOne({ equipmentId });
+    if (!equipment) {
+      // 设备不存在
+      return null;
+    }
 
-router.post('/EquipmentDetail/RepairHistory',async(req, res) => {
-  //const data = await Fault.find()
-  // 创建查询条件
-  const query = {  
-    status: '已维修',  
-    faultDate: {  
-      $gte: req.body.startDate,  
-      $lte: req.body.endDate  
-    }  
-  };  
-  try {  
-    const equipmentDetail = await Fault.find(query).exec();  
-    res.json(equipmentDetail); // 将结果以JSON格式返回给客户端 
-  } catch (error) {  
-    console.error('检索设备详情时出错：', error);  
-    res.status(500).send('服务器错误');  
-  }  
-})
-router.post('/EquipmentDetail/RepairSubmit',async(req, res) => {
-  // 创建查询条件
-  const equipmentId = req.body.equipmentId;
-  var repairHistory = {}
-  repairHistory.repairEngineer = req.body.repairEngineer;
-  repairHistory.repairTime = req.body.repairTime;
-  repairHistory.repairLocation = req.body.repairLocation;
-  repairHistory.repairMoney = req.body.repairMoney;
-  repairHistory.repairContext = req.body.repairContext;
-  repairHistory.repairNotes = req.body.repairNotes;
+    const repairHistory = equipment.repairHistory;
 
-  const status = '已维修';
-  const updateFault = {  
-    $set: {  
-      repairHistory,
-      status
-    }  
-  };  
-    
-  Fault.updateOne({ equipmentId }, updateFault)  
-    .then(() => {  
-      res.status(200).send('Fault updated successfully'); // 发送200成功响应  
-    })  
-    .catch((error) => {  
-      res.status(500).send('Error updating fault'); // 发送500错误响应  
+    // 使用聚合框架进行筛选
+    const filteredRepairHistory = repairHistory.filter((history) => {
+      const repairDate = new Date(history.repairDate).getTime()
+      return repairDate >=  startDate && repairDate <= endDate
     });
+    return filteredRepairHistory;
+  } catch (error) {
+    // 处理查询过程中的错误
+    console.error(error);
+    throw error;
+  }
+};
+
+router.post('/EquipmentDetail/RepairSearch',async(req, res) => {
+// 使用示例
+const equipmentIdToCheck = req.body.equipmentId // 替换成实际的设备ID
+const startDateToCheck =  new Date(req.body.startDate).getTime()   // 替换成实际的起始日期
+const endDateToCheck = new Date(req.body.endDate).getTime() // 替换成实际的结束日期
+
+getRepairHistoryBetweenDates(equipmentIdToCheck, startDateToCheck, endDateToCheck)
+  .then((filteredRepairHistory) => {
+    if (filteredRepairHistory) {
+      res.send(filteredRepairHistory)
+    } else {
+      res.send(null)
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
 })
+router.post('/EquipmentDetail/RepairSubmit', async (req, res) => {
+  try {
+    const equipmentId = req.body.equipmentId;
+
+    // 设置 repairStatus 字段
+    let updateData = {};
+    if (req.body.repairWay === '返厂') {
+      updateData['status'] = '已返厂';
+      req.body.repairStatus = '已返厂';
+    } else {
+      updateData['status'] = '已维修';
+      req.body.repairStatus = '已维修';
+
+    }
+
+    // 使用 $push 操作符将数据添加到 repairHistory 数组中
+    updateData['$push'] = { repairHistory: req.body };
+
+    // 使用 $set 操作符更新 status 字段
+    updateData['$set'] = { status: req.body.repairStatus };
+
+    // 更新机器状态和 repairHistory 字段
+    const equipmentDetail = await Fault.updateOne(
+      { equipmentId: equipmentId },
+      updateData
+    );
+    // 确保更新成功后发送成功响应
+    if (equipmentDetail.modifiedCount > 0) {
+      res.send({ success: true });
+    } else {
+      res.send({ success: false, message: 'Update failed or no matching document found.' });
+    }
+  } catch (error) {
+    res.send({ success: false, error: error.message });
+  }
+});
+
 
 router.post('/CheckAndRetrieveQualityDate',async(req, res) => {
   const result = await dbController.getProtectTimeByEquipmentId(orderEquipment,req.body.equipmentId);

@@ -30,4 +30,13 @@ router.post('/tenpinfo', upload.single('file'), (req, res) => {
   // 文件上传成功后的处理
   res.json({ success: true, message: 'File uploaded successfully!' });
 });
+router.get('/faultImage/uploads/:filename', (req, res) => {
+  const filename = req.params.filename;
+  console.log('filename',filename)
+  const imagePath = path.join(__dirname, '..', 'uploads',filename);
+  console.log('imagePath',imagePath)
+  res.sendFile(imagePath);
+});
+
+
 module.exports = router;

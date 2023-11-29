@@ -23,7 +23,7 @@
             <el-form-item label="故障图片上传">
                 <!-- <ButtonUpload :buttonText="'上传图片/视频'" /> -->
                 <el-upload type="file" ref="uploadRef" class="upload-demo" :auto-upload="false" clearable
-                    :on-change="handleChange">
+                    :on-change="handleChange" :on-remove="handleRemove">
                     <template #trigger>
                         <el-button type="primary">上传图片/视频</el-button>
                     </template>
@@ -66,37 +66,59 @@ const formInline = reactive({//这里就是获取的数据
     faultPhenomenon: '',
     notes: ''
 })
-
 const uploadRef = ref<UploadInstance>()
 var uploadData = new FormData()
+
 const handleChange: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
     const file = uploadFile.raw as File;
-    uploadData.append('file', file)
+    uploadData.append('files', file)
 }
+const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
+    const file = uploadFile.raw as File;
 
-const onSubmit = async() => {
+    // 获取 FormData 中所有 'files' 的文件
+    const files = Array.from(uploadData.getAll('files'));
+
+    // 找到要删除的文件的索引
+    const index = files.findIndex((f) => f === file);
+
+    if (index !== -1) {
+        // 从数组中移除文件
+        files.splice(index, 1);
+
+        // 创建一个新的 FormData，将更新后的文件数组添加到 'files' 键中
+        const newFormData = new FormData();
+        files.forEach((f) => {
+            newFormData.append('files', f);
+        });
+
+        // 更新 uploadData
+        uploadData = newFormData;
+    }
+}
+const onSubmit = async () => {
+    console.log('uploadData', uploadData)
     //除上传图片，其他为空，则弹框，不请求
-    if(formInline.clientName==''||formInline.equipmentName==''||formInline.equipmentId==''||formInline.faultDate==''||formInline.faultPhenomenon==''||formInline.notes==''){
+    if (formInline.clientName == '' || formInline.equipmentName == '' || formInline.equipmentId == '' || formInline.faultDate == '' || formInline.faultPhenomenon == '' || formInline.notes == '') {
         ElMessageBox.alert('输入不能为空', '提示：', {
-                    confirmButtonText: '确认',
-                })
+            confirmButtonText: '确认',
+        })
         return;
     }
-    const checkresult =  await axiosServer.AxiosPost(formInline, '/Equipment/CheckAndRetrieveQualityDate')
-    console.log('checkresult',checkresult)
-    if(checkresult.success == false){
+    const checkresult = await axiosServer.AxiosPost(formInline, '/Equipment/CheckAndRetrieveQualityDate')
+    if (checkresult.success == false) {
         ElMessage.error('添加失败，该设备并未中标！');
-        return 
+        return
     }
-    uploadData.append('clientName',formInline.clientName)
-    uploadData.append('equipmentName',formInline.equipmentName)
-    uploadData.append('equipmentId',formInline.equipmentId)
-    uploadData.append('faultDate',formInline.faultDate)
-    uploadData.append('faultPhenomenon',formInline.faultPhenomenon)
-    uploadData.append('notes',formInline.notes)
-    uploadData.append('qualityDate',checkresult.result.protectTime)
-    uploadData.append('signforDate',checkresult.result.signforDate)
-    console.log('uploadData',uploadData)
+    uploadData.append('clientName', formInline.clientName)
+    uploadData.append('equipmentName', formInline.equipmentName)
+    uploadData.append('equipmentId', formInline.equipmentId)
+    uploadData.append('faultDate', formInline.faultDate)
+    uploadData.append('faultPhenomenon', formInline.faultPhenomenon)
+    uploadData.append('notes', formInline.notes)
+    uploadData.append('qualityDate', checkresult.result.protectTime)
+    uploadData.append('signforDate', checkresult.result.signforDate)
+    console.log('uploadData', uploadData.values)
     axios(
         {
             url: '/Equipment/EquipmentSubmit',
