@@ -21,6 +21,22 @@
         "消化内镜",
         "宫腔镜"
     ],
+    "selectModelName": [
+        "力反馈腹腔镜",
+        "虚实结合腹腔镜",
+        "消化内镜",
+        "宫腔镜"
+    ],
+    "selectModelFunctions": [
+        "招标前演示",
+        "样机试用"
+    ],
+    "modelNameStyle":{
+        "力反馈腹腔镜":"SSSSS",
+        "虚实结合腹腔镜":"DDDDD",
+        "消化内镜":"AAAAAA",
+        "宫腔镜":"hhhhhh"
+    },
     "paymentMethod": [
         "微信",
         "支付宝"

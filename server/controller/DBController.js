@@ -156,7 +156,6 @@ async function GetCollectionsByDateRange(dbController, startDate, endDate) {
 }
 async function GetCollectionsByKeywordAndDate (dbController, keyword,keywordFields,startDate ,endDate,dateFields ){
   var dynamicConditions
-  console.log('dateFields',dateFields)
   // 构建动态查询条件
   if(dateFields.length == 0){
     dynamicConditions = {
@@ -194,6 +193,10 @@ async function getProtectTimeByEquipmentId(dbController,equipmentId) {
     return null; // 出现错误也返回 null
   }
 }
+/**
+ * 样机申请表查询
+ */
+
 module.exports = { CreateInsert, Update,GetCollectionsByCondition, Delete, 
   GetCollections, UpdateNetwork, 
   GetDataByfieldNameAndfieldValues,

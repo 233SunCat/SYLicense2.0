@@ -4,32 +4,65 @@ var cors = require('cors');
 const multer = require('multer'); // 用于处理 multipart/form-data 类型的数据  
 const mongoose = require('mongoose');
 const dbController = require('../controller/DBController')
-const Fault = require('../model/ModelNamelist'); // 导入你定义的模型  
-const modelApply = require('../model/ModelApply'); // 导入你定义的模型  
+const ShipModel = require('../model/ShipModel'); // 导入你定义的模型  
+const ModelApply = require('../model/ModelApply')
 router.use(cors());
 
 
-router.get('/MNlistSearch', async function (req, res, next) {
-    // 确保已经连接到数据库  
-    //dbController.CreateInsert(Fault, {modelName:'虚实结合腹腔镜',modelStyle:'BBQ',modelModule:['基础技能训练','实物训练']});
-    const resDate =  await dbController.getData(Fault);
-    res.send(resDate)
-});
-
 router.post('/ModelAdd', async function (req, res, next) {
-
-    // 确保已经连接到数据库  
-    //dbController.CreateInsert(Fault, {modelName:'虚实结合腹腔镜',modelStyle:'BBQ'});
-    const resDate =  await dbController.CreateInsert(Fault, req.body);
-    res.send('resDate')
+    const result =  await dbController.CreateInsert(ShipModel, req.body);
+    res.send(result)
 });
 router.post('/ModelApply', async function (req, res, next) {
-
-    // 确保已经连接到数据库  
-    //dbController.CreateInsert(Fault, {modelName:'虚实结合腹腔镜',modelStyle:'BBQ'});
-    console.log(req.body)
-    const resDate =  await dbController.CreateInsert(modelApply, req.body);
-    res.send(resDate)
+    const result =  await dbController.CreateInsert(ModelApply, req.body);
+    res.send(result)
 });
+router.post('/ModelApplySearch', async function (req, res, next) {
+  // const query = {  
+  //   applyDateApply: {  
+  //     $gte: req.body.startDate,  
+  //     $lte: req.body.endDate  
+  //   }  
+  // };  
+  // if(req.body.selectedOption!=''){
+  //   query.status = req.body.selectedOption
+  // }
+  // if(req.body.keyword!=''){
+  //   const keywordRegex = new RegExp(req.body.keyword, 'i');  
+  //   query.$or = [  
+  //     { applyNameApply: { $regex: keywordRegex } },  
+  //     { usedNameApply: { $regex: keywordRegex } } ,
+  //     {usedFunctionApply:{ $regex: keywordRegex }},
+  //     {modelNameApply:{ $regex: keywordRegex }},
+  //     {arrivalLocationApply:{ $regex: keywordRegex }},
+  //   ];  
+  // }
 
+  try {  
+    const keywordArray = ['applyNameApply','usedNameApply','usedFunctionApply','modelNameApply','arrivalLocationApply']
+    const DateArray = ['applyDateApply']
+    const startDate = req.body.startDate
+    const endDate = req.body.endDate
+    const keyword = req.body.keyword
+    var result = await dbController.GetCollectionsByKeywordAndDate(ModelApply, keyword, keywordArray
+      , startDate, endDate, DateArray)
+    res.json(result); // 将结果以JSON格式返回给客户端 
+  } catch (error) {  
+    console.error('检索设备详情时出错：', error);  
+    res.status(500).send('服务器错误');  
+  } 
+});
+/**
+ * 获得样机库，所有样机
+ */
+router.post('/ModelByModelName', async function (req, res, next) {
+  const query = req.body
+  console.log('22222',query)
+  var result = await dbController.GetCollectionsByCollections(ShipModel, query)  
+  result = result.map(item => ({
+    modelName:item.modelName,modelId:item.modelId,inventoryStatus:item.inventoryStatus
+  }))
+  console.log('result',result)
+  res.send(result)
+});
 module.exports = router;

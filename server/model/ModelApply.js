@@ -1,39 +1,60 @@
 const Mongoose = require("mongoose");
-const ModelNamelist = Mongoose.Schema({
+const ModelApply = Mongoose.Schema({
     wxid: String,
-    modelApplyName: {//样机申请方
+
+    applyNameApply: {//样机申请方
         type: String,
         default: ""
     },
-    modelUsedName:{//样机使用用户
+    usedNameApply:{//样机使用用户
         type: String,
         default: ""
     },
-    modelUsedFunction:{//样机使用用途
+    usedFunctionApply:{//样机使用用途
         type: String,
         default: ''
     },
-    modelName:{//选择设备名称
+    modelNameApply:{//选择设备名称
         type: String,
         default: ''
     },
-    modelModule:{//设备模块
+    modelModuleApply:{//设备模块
         type: [String],
         default: ['']
     },
-    modelArrivelTime:{//期望样机到货时间
+    arrivalDateApply:{//期望样机到货时间
         type: Date,
-        default: Date.now
+        default: null
     },
-    modelArriveLocation:{//期望样机到货地点
+    arrivalLocationApply:{//期望样机到货地点
         type: String,
         default: ''
-    }
+    },
+    applyDateApply:{//申请发起时间
+        type: String,
+        default: null
+    },
+    applyStatusApply:{//申请状态
+        type: String,
+        default: ''
+    },
+    modelIdAllocation: {//设备编号
+        type: String,
+        default: ""
+    },
+    modelStyleAllocation: {//设备型号
+        type: String,
+        default: ""
+    },
+    modelModuleAllocation: {//申请模块信息
+        type: [String],
+        default: ['']
+    },
 }
 );
   
   
-const Fault = Mongoose.model('modeapply', ModelNamelist,'modeapply');
+const Fault = Mongoose.model('modeapply', ModelApply,'modeapply');
 
 // console.log(Fault)
 // module.exports = Fault;

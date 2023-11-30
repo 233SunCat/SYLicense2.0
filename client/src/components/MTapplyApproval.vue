@@ -3,84 +3,43 @@
     <!-- 检索条件一排显示 -->
     <el-row :gutter="20" style="width: 100%">
       <el-col :span="3">
-        <el-input
-          :suffix-icon="Search"
-          v-model="keyword"
-          placeholder="关键字搜索"
-        ></el-input>
+        <el-input :suffix-icon="Search" v-model="keyword" placeholder="关键字搜索"></el-input>
       </el-col>
       <el-col :span="3">
-        <el-select
-          v-model="selectedOption"
-          placeholder="下拉框条件选择"
-          style="width: 200px"
-        >
-          <el-option
-            v-for="option in options"
-            :key="option.value"
-            :label="option.label"
-            :value="option.value"
-          >
+        <el-select v-model="selectedOption" placeholder="下拉框条件选择" style="width: 200px">
+          <el-option v-for="option in options" :key="option.value" :label="option.label" :value="option.value">
           </el-option>
         </el-select>
       </el-col>
       <el-col :span="1"> </el-col>
       <el-col :span="3">
-        <el-date-picker
-          v-model="startDate"
-          type="date"
-          placeholder="选择起始日期"
-        >
+        <el-date-picker v-model="startDate" type="date" placeholder="选择起始日期">
         </el-date-picker>
       </el-col>
       <el-col :span="1"> </el-col>
       <el-col :span="3">
-        <el-date-picker
-          v-model="endDate"
-          type="date"
-          placeholder="选择结束日期"
-        >
+        <el-date-picker v-model="endDate" type="date" placeholder="选择结束日期">
         </el-date-picker>
       </el-col>
       <el-col :span="4"> </el-col>
       <el-col :span="2">
-        <el-button
-          style="text-align: right"
-          type="primary"
-          icon="el-icon-download"
-          @click="dataSearch"
-          >数据查询</el-button
-        >
+        <el-button style="text-align: right" type="primary" icon="el-icon-download" @click="dataSearch">数据查询</el-button>
       </el-col>
       <el-col :span="3">
-        <el-button
-          style="text-align: right"
-          type="primary"
-          icon="el-icon-download"
-          @click="exportToExcel"
-          >数据导出</el-button
-        >
+        <el-button style="text-align: right" type="primary" icon="el-icon-download"
+          @click="exportToExcel">数据导出</el-button>
       </el-col>
     </el-row>
     <!--Excel表格导出-->>
     <el-table :data="tableData" style="width: 100%">
       <!-- 表格列定义 -->
       <!-- <el-table-column prop="name" label="序号"></el-table-column> -->
-      <el-table-column
-        prop="modelApplyName"
-        label="模块训练申请人"
-      ></el-table-column>
+      <el-table-column prop="modelApplyName" label="模块训练申请人"></el-table-column>
       <el-table-column prop="applyDate" label="申请时间"></el-table-column>
       <el-table-column prop="wxID" label="微信ID"></el-table-column>
       <el-table-column prop="modelName" label="设备名场"></el-table-column>
-      <el-table-column
-        prop="cpuSerialNumber"
-        label="处理器序列号"
-      ></el-table-column>
-      <el-table-column
-        prop="diskSerialNumber"
-        label="硬盘序列号"
-      ></el-table-column>
+      <el-table-column prop="cpuSerialNumber" label="处理器序列号"></el-table-column>
+      <el-table-column prop="diskSerialNumber" label="硬盘序列号"></el-table-column>
       <el-table-column prop="approvalStatus" label="审核状态"></el-table-column>
       <el-table-column prop="operation" label="操作">
         <template #default="scope">
@@ -88,20 +47,11 @@
           <!-- <router-link style="  text-decoration: none;" to="/Equipment/EquipmentDetail">
             <el-button type="success" plain @click="handleRowClick(scope.row)">查看详情</el-button>
             </router-link> -->
-          <el-button
-            v-if="scope.row.approvalStatus === '通过'"
-            type="success"
-            plain
-            @click="handleDetailsClick(scope.row)"
-          >
+          <el-button v-if="scope.row.approvalStatus === '通过'" type="success" plain @click="handleDetailsClick(scope.row)">
             查看详情
           </el-button>
-          <el-button
-            v-else-if="scope.row.approvalStatus === '待审核'"
-            type="primary"
-            plain
-            @click="handleAuditClick(scope.row)"
-          >
+          <el-button v-else-if="scope.row.approvalStatus === '待审核'" type="primary" plain
+            @click="handleAuditClick(scope.row)">
             审核
           </el-button>
         </template>

@@ -19,16 +19,16 @@
           <el-table :data="tableData" style="width: 100%">
             <!-- 表格列定义 -->
             <!-- <el-table-column prop="name" label="序号"></el-table-column> -->
-            <el-table-column prop="modelApplyName" label="申请方"></el-table-column>
-            <el-table-column prop="modelApplyTime" label="申请时间"></el-table-column>
-            <el-table-column prop="modelUsedName" label="使用用户"></el-table-column>
-            <el-table-column prop="modelUsedFunction" label="样机用途"></el-table-column>
-            <el-table-column prop="modelName" label="设备名称"></el-table-column>
-            <el-table-column prop="modelModule" label="模块信息" :show-overflow-tooltip='true'></el-table-column>
-            <el-table-column prop="modelArrivalTime" label="期望发货时间"></el-table-column>
-            <el-table-column prop="modelArrivalLocation" label="期望发货地址"></el-table-column>
-            <el-table-column prop="modelApplyStatus" label="状态"></el-table-column>
-            <el-table-column prop="modelApplyOperation" label="操作">
+            <el-table-column prop="applyNameApply" label="申请方"></el-table-column>
+            <el-table-column prop="applyDateApply" label="申请时间"></el-table-column>
+            <el-table-column prop="usedNameApply" label="使用用户"></el-table-column>
+            <el-table-column prop="usedFunctionApply" label="样机用途"></el-table-column>
+            <el-table-column prop="modelNameApply" label="设备名称"></el-table-column>
+            <el-table-column prop="modelModuleApply" label="模块信息" :show-overflow-tooltip='true'></el-table-column>
+            <el-table-column prop="arrivalDateApply" label="期望发货时间"></el-table-column>
+            <el-table-column prop="arrivalLocationApply" label="期望发货地址"></el-table-column>
+            <el-table-column prop="applyStatusApply" label="状态"></el-table-column>
+            <el-table-column prop="operation" label="操作">
               <template #default="scope">
                 <!-- 按钮，点击后跳转到其他页面 -->
                 <el-button type="success" plain @click="handleRowClick(scope.row)">去发货</el-button>
@@ -42,58 +42,36 @@
 </template>
 <script lang="ts" setup>
 import { ref, reactive } from 'vue'
-import axios from "axios";
 import { useRouter } from "vue-router";
-import dayjs from "dayjs"
-//数据
+import axiosServer from '../assets/common/axios-server'
+import qs from 'qs'; // 引入 qs 库
 const tableData = ref([]);
 const keyword = ref("");
 const startDate = ref(new Date());
 const endDate = ref(new Date());
+const router = useRouter();
 
-//事件
-
-
-//通信
-const dataSearch = () => {//查询条件
+const dataSearch = async() => {//查询条件
   const searchData = { keyword: keyword.value, startDate: startDate.value, endDate: endDate.value }
-  axios({
-    url: "/Model/ModelApplySearch",
-    data: searchData,
-    method: "post",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  }).then((res) => {
-    if (res.status == 200) {
-      //确认保存后，即使清空
-      console.log('返回数据：', res.data)
-      console.log(res.data)
-      tableData.value = res.data.map(item => {
-        item.modelApplyTime = new Date(item.modelApplyTime).toLocaleString('zh-CN', {
-          hour12: false
-        });
-
-        item.modelArrivalTime = new Date(item.modelArrivalTime).toLocaleString('zh-CN', {
-          hour12: false
-        });
-
+  const result =  await axiosServer.AxiosPost(qs.stringify(searchData), '/Model/ModelApplySearch')
+  console.log('result',result)
+  tableData.value = result.map(item => {
+        item.applyDateApply = new Date(item.applyDateApply).toLocaleDateString()
+        item.arrivalDateApply = new Date(item.arrivalDateApply).toLocaleDateString()
         return item;
       });
-    }
-  });
+
 }
-const router = useRouter();
 
 const handleRowClick = (row: any) => {//表格跳转
   // 处理按钮点击事件，跳转到其他页面
   //点击的向服务端发送请求拿到数据之后跳转
   router.push({
-    path: '/MTapplyAddL',
+    path: '/MTapply/MTShip',
     query: {
-      modelApplyName: row.modelApplyName, modelUsedName: row.modelUsedName,
-      modelUsedFunction: row.modelUsedFunction, modelName: row.modelName,
-      modelModule: row.modelModule, modelArrivalTime: row.modelArrivalTime,
+      applyNameApply: row.applyNameApply, usedNameApply: row.usedNameApply,
+      usedFunctionApply: row.usedFunctionApply, modelNameApply: row.modelNameApply,
+      modelModuleApply: row.modelModuleApply, arrivalDateApply: row.arrivalDateApply,
     }
     // 多个参数这样的写法
     // query:{Shuju}
