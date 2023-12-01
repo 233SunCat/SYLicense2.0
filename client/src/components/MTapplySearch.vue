@@ -45,6 +45,9 @@ import { ref, reactive } from 'vue'
 import { useRouter } from "vue-router";
 import axiosServer from '../assets/common/axios-server'
 import qs from 'qs'; // 引入 qs 库
+import dayjs from 'dayjs'
+
+import { ITEM_RENDER_EVT } from 'element-plus/es/components/virtual-list/src/defaults';
 const tableData = ref([]);
 const keyword = ref("");
 const startDate = ref(new Date());
@@ -56,13 +59,12 @@ const dataSearch = async() => {//查询条件
   const result =  await axiosServer.AxiosPost(qs.stringify(searchData), '/Model/ModelApplySearch')
   console.log('result',result)
   tableData.value = result.map(item => {
-        item.applyDateApply = new Date(item.applyDateApply).toLocaleDateString()
-        item.arrivalDateApply = new Date(item.arrivalDateApply).toLocaleDateString()
+        item.applyDateApply = dayjs(item.applyDateApply).format("YYYY-MM-DD hh:mm:ss")
+        item.arrivalDateApply = dayjs(item.arrivalDateApply).format("YYYY-MM-DD hh:mm:ss")
         return item;
       });
 
 }
-
 const handleRowClick = (row: any) => {//表格跳转
   // 处理按钮点击事件，跳转到其他页面
   //点击的向服务端发送请求拿到数据之后跳转
@@ -72,6 +74,7 @@ const handleRowClick = (row: any) => {//表格跳转
       applyNameApply: row.applyNameApply, usedNameApply: row.usedNameApply,
       usedFunctionApply: row.usedFunctionApply, modelNameApply: row.modelNameApply,
       modelModuleApply: row.modelModuleApply, arrivalDateApply: row.arrivalDateApply,
+      applyDateApply:row.applyDateApply
     }
     // 多个参数这样的写法
     // query:{Shuju}

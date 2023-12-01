@@ -1,5 +1,5 @@
 <template>
-    <div class="common-layout" style="height: 100%;">
+    <div class="common-layout" style="height: 70%;">
         <el-container style="height: 100%;">
             <el-header style="background-color: #f6f8f8; display: flex; align-items: center; ">
                 <el-text class="mx-1" size="large">用户信息</el-text>
@@ -20,20 +20,6 @@
                                 <el-option v-for="Function in equipmentFunctions" :key="Function" :label="Function"
                                     :value="Function" />
                             </el-select>
-                        </el-form-item>
-                        <el-form-item label="选择设备名称：">
-                            <el-select style="width: 100%;" v-model="formInline.modelNameApply" placeholder="设备名称" clearable>
-                                <el-option v-for="Name in equipmentNames" :key="Name" :label="Name" :value="Name" />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="模块选择：">
-                            <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate"
-                                @change="handleCheckAllChange">全选</el-checkbox>
-                            <el-checkbox-group v-model="formInline.modelModuleApply" @change="handleCheckedCitiesChange">
-                                <el-checkbox v-for="item in module" :key="item" :label="item">{{
-                                    item
-                                }}</el-checkbox>
-                            </el-checkbox-group>
                         </el-form-item>
                         <el-form-item label="期望到货时间">
                             <el-date-picker v-model="formInline.arrivalDateApply" type="datetime" placeholder="选择期望到货时间"
@@ -62,7 +48,12 @@ import messageBox from '../assets/common/message-box'
 import funBox from '../assets/common/fun-box'
 import qs from 'qs'; // 引入 qs 库
 import dayjs from 'dayjs'
-
+import { useRouter, useRoute } from 'vue-router';
+const route = useRoute()
+const modelIdAllocation = route.query.modelId
+const modelNameAllocation = route.query.modelName
+const modelInventoryStatusAllocation = '在库'
+const modelModuleAllocation = route.query.modelModule
 //数据
 const defaultTime = new Date(2000, 1, 1, 12, 0, 0)
 const labelPosition = ref<FormProps['labelPosition']>('right')
@@ -76,10 +67,10 @@ const getDefaultFormInline = () => {
     applyNameApply: '',
     usedNameApply: '',
     usedFunctionApply: '',
-    modelNameApply: '',
+    //modelNameApply: '',
     arrivalDateApply: new Date(),
     arrivalLocationApply: '',
-    modelModuleApply: module.length !== 0 ? module.slice(0, 2) : [],
+    //modelModuleApply: module.length !== 0 ? module.slice(0, 2) : [],
     applyDateApply: dayjs(Date()).format("YYYY-MM-DD hh:mm:ss"),
     applyStatusApply: '待审核'
   };
@@ -102,6 +93,10 @@ const eamilSubmit = () => {//发送请求
     console.log('formInline',formInline)
     const formInlineFields = Object.keys(formInline);  
     if(funBox.checkRequiredFields(formInline, formInlineFields)){return}
+    formInline.modelIdAllocation = modelIdAllocation
+    formInline.modelNameAllocation = modelNameAllocation
+    formInline.modelInventoryStatusAllocation = modelInventoryStatusAllocation
+    formInline.modelModuleAllocation = modelModuleAllocation
     axiosServer.AxiosPost(qs.stringify(formInline), '/Model/ModelApply').then(res => {
     if (res.success == true) {
         Object.assign(formInline, getDefaultFormInline());

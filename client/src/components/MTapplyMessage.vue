@@ -74,8 +74,6 @@ const getDefaultFormInline = () => {
 const formInline = reactive(getDefaultFormInline())
 
 const isIndeterminate = ref(true)
-
-
 </script>
   
 <style>

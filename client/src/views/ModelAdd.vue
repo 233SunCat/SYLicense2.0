@@ -52,7 +52,8 @@ const formInline = reactive({//这里就是获取的数据
   produceDate: '',
   softwareVersion: '',
   modelStyle: '',
-  inventoryStatus: '是'
+  inventoryStatus: '是',
+  modelModule: constants.Module
 })
 var models = ref(constants.selectEquipmentName);
 const InputClear = () => {

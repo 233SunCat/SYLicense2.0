@@ -10,12 +10,7 @@
   import axios from 'axios'
   import {ref,provide,onMounted} from 'vue'  
   
-  const prototypeName = "123456"
-  const prototype = "123456"
-  const prototypeMode = "123456"
-  const manufactureDate = "123456"
-  const location = "123456"
-  const destination = ""//目的地
+
   
   
   //样机流转信息

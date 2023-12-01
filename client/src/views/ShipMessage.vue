@@ -14,7 +14,6 @@
           <ShipInspection style="margin-top: 30px;"/>
           <ShipContracts style="margin-top: 30px;"/>
           <ShipEvent style="margin-top: 30px;"/>
-
         </el-main>
       </el-container>
     </div>

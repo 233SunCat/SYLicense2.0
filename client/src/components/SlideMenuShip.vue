@@ -1,5 +1,5 @@
 <template>
-  <el-menu default-active="2" class="el-menu-vertical-demo"
+  <el-menu default-active="null" class="el-menu-vertical-demo"
     background-color="#f3f5f6" style="height: 100%;">
     <el-sub-menu :index="item.key + ''" v-for="item in menus" :key="item.key" style="width: auto;">
       <template #title>
@@ -136,7 +136,6 @@ ShipMenuSlide()
 const handleMenuItemClick = (menuItem: any) => {
   //emit('add', shuzu)
   // 这里处理菜单项的点击事件  
-  console.log("点击了菜单项：", { clientName: menuItem.clientName, orderDate: menuItem.orderDate, equipmentIds: menuItem.equipmentId ,orderStatus:menuItem.orderStatus});
   EventBus.emit("slide-ship", { clientName: menuItem.clientName, orderDate: menuItem.orderDate, equipmentIds: menuItem.equipmentId ,orderStatus:menuItem.orderStatus});
   EventBus.emit("slide-ship-order", { clientName: menuItem.clientName, orderDate: menuItem.orderDate,orderStatus:menuItem.orderStatus});
 }
