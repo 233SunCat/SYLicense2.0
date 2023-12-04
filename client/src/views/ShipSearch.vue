@@ -10,13 +10,13 @@
         <el-checkbox v-model="userCheckAll" @change="handleCheckAllChange0(userCheckAll)"
                   >全选</el-checkbox>
         <el-checkbox-group v-model="formInline.userItems" >
-                <el-checkbox v-for="item in userItems" :key="item" :label="item">
+                <el-checkbox v-for="item in userItems" :key="item" :label="item" :disabled="item === '用户名称'">
                     {{item}}</el-checkbox>
         </el-checkbox-group>
         <el-checkbox v-model="equipmentCheckAll" @change="handleCheckAllChange1(equipmentCheckAll)"
                   >全选</el-checkbox>
         <el-checkbox-group v-model="formInline.equipmentItems" >
-            <el-checkbox v-for="item in equipmentItems" :key="item" :label="item">
+            <el-checkbox v-for="item in equipmentItems" :key="item" :label="item" :disabled="item === '设备名称'||item === '设备型号'">
                 {{item}}</el-checkbox>
         </el-checkbox-group>
         <el-checkbox v-model="contractsCheckAll"  @change="handleCheckAllChange2(contractsCheckAll)"
@@ -150,10 +150,18 @@ var equipmentStyleCount = ref({})
 var sumMoney = ref(0)
 var sumServiceFee = ref(0)
 const startDate = ref(new Date());
+startDate.value.setMonth(startDate.value.getMonth() - 1);
 const endDate = ref(new Date());
+//勾选框
+const userItems = ['用户名称','订单状态','订单时间']
+const equipmentItems = ['设备名称','设备型号','模块信息','是否联网','质保期']
+const contractsItems = ['代理商信息','合同签订日期','合同签订金额','中标价格','付款日期','服务费']
+const invoiceItems = ['开票情况','开票日期','开票编号']
+const emailItems = ['发货时间',"验收日期"]
+
 const formInline = reactive({//这里就是获取的数据
-  userItems: [],
-  equipmentItems: [],
+  userItems: ['用户名称'],
+  equipmentItems: ['设备名称','设备型号'],
   contractsItems: [],
   invoiceItems: [],
   emailItems: [],
@@ -165,12 +173,8 @@ const equipmentCheckAll = ref(false)
 const contractsCheckAll = ref(false)
 const invoiceCheckAll = ref(false)
 const emailCheckAll = ref(false)
-//勾选框
-const userItems = ['用户名称','订单状态','订单时间']
-const equipmentItems = ['设备名称','设备型号','模块信息','是否联网','质保期']
-const contractsItems = ['代理商信息','合同签订日期','合同签订金额','中标价格','付款日期','服务费']
-const invoiceItems = ['开票情况','开票日期','开票编号']
-const emailItems = ['发货时间',"验收日期"]
+
+
 //勾选框全选
 const handleCheckAllChange0 = (val: boolean) => {
   formInline.userItems = val ? userItems : []
@@ -192,6 +196,7 @@ const handleCheckAllChange4 = (val: boolean) => {
 
 //查询条件
 const onSubmit = () => {
+
     const val = { startDate: startDate.value, endDate: endDate.value ,keyword:keyword.value,formInline:formInline}
       axiosServer.AxiosPost(qs.stringify(val),'/ShipClient/GetShipSearch').then(res=>{
             equipmentCount.value = res.filter(item => item.equipmentId != '').length;

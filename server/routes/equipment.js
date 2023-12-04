@@ -6,18 +6,32 @@ const InsertEquipment = require('../controller/EquipmentController')
 const Fault = require('../model/Equipment'); // 导入你定义的模型  
 const dbController = require('../controller/DBController')
 const orderEquipment = require('../model/ShipEquipment')
-
+const path = require('path')
+const md5 = require('md5');
 
 const multer = require('multer'); // 用于处理 multipart/form-data 类型的数据  
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, './uploads')
+const upload = multer({
+  // 文件上传的位置
+  // dest: path.join(__dirname, "../public/uploads"),
+  fileFilter(req, file, callback) {
+    // 解决中文名乱码的问题 latin1 是一种编码格式
+    file.originalname = Buffer.from(file.originalname, "latin1").toString(
+      "utf8"
+    );
+    callback(null, true);
   },
-  filename(req, file, cb) {
-    cb(null,  file.originalname)
-  }
-})
-const upload = multer({ storage })
+  storage: multer.diskStorage({
+    //上传文件的目录
+    destination: function(req, file, cb) {
+      cb(null, './uploads')
+    },//上传的相对路径
+    //上传文件的名称
+    filename: function (req, file, cb) {
+      cb(null, decodeURI(file.originalname))
+    }
+  })
+});
+
 router.use(cors());
 
 router.post('/EquipmentSubmit', upload.array('files', 5), async (req, res) => {
@@ -28,7 +42,7 @@ router.post('/EquipmentSubmit', upload.array('files', 5), async (req, res) => {
     const faultDate = req.body.faultDate;
     const faultPhenomenon = req.body.faultPhenomenon;
     const notes = req.body.notes;
-    const qualityDate = req.body.qualityDate;
+    const protectTime = req.body.protectTime;
     const signforDate = req.body.signforDate;
     const status = '待维修';
 
@@ -36,7 +50,6 @@ router.post('/EquipmentSubmit', upload.array('files', 5), async (req, res) => {
     const files = req.files;
     const filePaths = files.map(file => file.path);
     const imageVideo = filePaths;
-
     // 使用updateOne方法，根据equipmentId进行更新或插入
     const result = await Fault.updateOne(
       { equipmentId: equipmentId },
@@ -47,7 +60,7 @@ router.post('/EquipmentSubmit', upload.array('files', 5), async (req, res) => {
           faultDate,
           faultPhenomenon,
           notes,
-          qualityDate,
+          protectTime,
           signforDate,
           status,
           imageVideo,
@@ -93,6 +106,27 @@ router.post('/EquipmentSearch',async(req, res) => {
   try {  
     const equipmentDetail = await Fault.find(query).exec();  
     res.json(equipmentDetail); // 将结果以JSON格式返回给客户端 
+  } catch (error) {  
+    console.error('检索设备详情时出错：', error);  
+    res.status(500).send('服务器错误');  
+  }  
+})
+/**
+ * 获得
+ */
+router.post('/EquipmentSearchImage',async(req, res) => {
+  //const data = await Fault.find()
+  // 创建查询条件
+  console.log('1111111')
+  const query = {  
+    equipmentId: req.body.equipmentId,  
+  };  
+  try {  
+    const equipmentDetail = await Fault.find(query).exec();  
+    if(equipmentDetail != null){
+      res.json(equipmentDetail[0].imageVideo); // 将结果以JSON格式返回给客户端 
+    }
+    console.log('equipmentDetail',equipmentDetail)
   } catch (error) {  
     console.error('检索设备详情时出错：', error);  
     res.status(500).send('服务器错误');  
@@ -152,6 +186,7 @@ getRepairHistoryBetweenDates(equipmentIdToCheck, startDateToCheck, endDateToChec
     console.error(error);
   });
 })
+
 router.post('/EquipmentDetail/RepairSubmit', async (req, res) => {
   try {
     const equipmentId = req.body.equipmentId;
@@ -190,7 +225,7 @@ router.post('/EquipmentDetail/RepairSubmit', async (req, res) => {
 });
 
 
-router.post('/CheckAndRetrieveQualityDate',async(req, res) => {
+router.post('/CheckAndRetrieveprotectTime',async(req, res) => {
   const result = await dbController.getProtectTimeByEquipmentId(orderEquipment,req.body.equipmentId);
   if (result != null) {
     return res.send({success:true,result:result})

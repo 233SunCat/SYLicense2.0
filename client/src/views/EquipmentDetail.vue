@@ -1,5 +1,5 @@
 <template style="height:100%;">
-  <div style="height: 100%; width: 100%">
+  <div  style="height: 100%; width: 100%">
     <div style="display: flex; justify-content: center">
       <el-text class="mx-1" style="font-size: 20px">{{ equipmentName }}</el-text>
       <el-tag style="margin: 10px">{{ qualiyStatus }}</el-tag>
@@ -9,15 +9,15 @@
     <div style="height: 8%; display: flex; justify-content: center">
       <el-tag class="ml-2" type="info">用户名称：{{ clientName }}</el-tag>
       <el-tag class="ml-2" type="info">设备编号：{{ equipmentId }}</el-tag>
-      <el-tag class="ml-2" type="info">质保期：{{ qualityDate }}</el-tag>
-      <el-tag class="ml-2" type="info">剩余质保期：{{ qualityDateLast }}</el-tag>
+      <el-tag class="ml-2" type="info">质保期：{{ protectTime }}</el-tag>
+      <el-tag class="ml-2" type="info">剩余质保期：{{ protectTimeLast }}</el-tag>
     </div>
-    <div>
-      <div style="display: flex; justify-content: center">
+    <div >
+        <div style="display: flex; justify-content: center">
         <el-text class="mx-1" style="font-size: 20px">故障详情</el-text>
       </div>
-      <div style="display: flex; justify-content: center">
-        <el-form :inline="false" class="demo-form-inline" :label-position="labelPosition" label-width="120px">
+      <div  style="display: flex; justify-content: center;width: 100%;">
+        <el-form :inline="false" class="demo-form-inline" :label-position="labelPosition" label-width="120px" style="width: 30%;">
           <el-form-item label="故障时间">
             <el-input v-model="inputDate" disabled clearable>初始值</el-input>
           </el-form-item>
@@ -28,7 +28,7 @@
             <el-input v-model="inputNotes" disabled clearable>初始值</el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" text @click="dialogFormVisible = true">填写维修记录</el-button>
+            <el-button type="primary" plain @click="dialogFormVisible = true">填写维修记录</el-button>
             <!-- Form -->
             <el-dialog v-model="dialogFormVisible" title="维修记录">
               <el-form :model="form" :inline="false" class="demo-form-inline" :label-position="labelPosition"
@@ -38,7 +38,8 @@
                 </el-form-item>
                 <el-form-item label="维修时间：" :label-width="formLabelWidth">
                   <el-date-picker v-model="form.repairDate" type="date" placeholder="选择维修时间" class="dialog-inputs">
-                  </el-date-picker> </el-form-item>
+                  </el-date-picker>
+                </el-form-item>
                 <el-form-item label="维修地点：" :label-width="formLabelWidth">
                   <el-input v-model="form.repairLocation" autocomplete="off" class="dialog-inputs" />
                 </el-form-item>
@@ -69,6 +70,16 @@
             </el-dialog>
             <!-- Form -->
           </el-form-item>
+          <el-form-item label="故障现象图片" >
+            <div class="demo-image"  v-for="url, index in imageInitUrls" :key="index">
+              <template v-if="isImage(url)">
+                <el-image :src="url" :fit="index" :preview-src-list="[url]" />
+              </template>
+              <template v-else>
+                <video controls :src="url" style="width: 100%; height: auto;"></video>
+              </template>
+            </div>
+          </el-form-item>
         </el-form>
       </div>
     </div>
@@ -88,7 +99,7 @@
           <el-button style="text-align: right" type="primary" icon="el-icon-download" @click="dataSearch">数据查询</el-button>
         </el-col>
       </el-row>
-      <el-table :data="tableData">
+      <el-table :data="tableData" :default-sort="{ prop: 'faultDate', order: 'descending' }">
         <el-table-column prop="repairStatus" label="状态"></el-table-column>
         <el-table-column prop="faultDate" label="故障时间"></el-table-column>
         <el-table-column prop="faultPhenomenon" label="故障现象"></el-table-column>
@@ -105,11 +116,26 @@
         <el-table-column prop="repairContext" label="维修内容"></el-table-column>
         <el-table-column prop="repairNotes" label="备注"></el-table-column>
       </el-table>
+      <div>
+        <el-row>
+          <el-col :span="4">
+            <el-statistic title="当前维修设备总次数" :value="repairCount" />
+          </el-col>
+          <el-col :span="4">
+            <el-statistic title="维修总成本" :value="repairMoney" />
+          </el-col>
+        </el-row>
+      </div>
       <el-dialog v-model="dialogImageVisible" title="维修记录">
         <div class="demo-image">
-          <div v-for="url,index in imageUrls" :key="index" class="block">
+          <div v-for="url, index in imageUrls" :key="index" class="block">
             <span class="demonstration">{{ index }}</span>
-            <el-image style="width: 100px; height: 100px" :src="url" :fit="index" :preview-src-list="[url]"/>
+              <template v-if="isImage(url)">
+                  <el-image :src="url" :fit="index" :preview-src-list="[url]" />
+                </template>
+              <template v-else>
+                <video controls :src="url" style="width: 100%; height: auto;"></video>
+              </template>
           </div>
         </div>
         <template #footer>
@@ -133,9 +159,13 @@ import axiosServer from '../assets/common/axios-server'
 import messageBox from '../assets/common/message-box'
 import qs from 'qs'; // 引入 qs 库
 
+const repairCount = ref(0)
+const repairMoney = ref(0)
 const dialogImageVisible = ref(false)
 const route = useRoute();
 const startDate = ref(new Date());
+startDate.value.setMonth(startDate.value.getMonth() - 1);
+
 const endDate = ref(new Date());
 const labelPosition = ref<FormProps["labelPosition"]>("right");
 const inputDate = ref(dayjs(route.query.faultDate).format("YYYY-MM-DD"));
@@ -145,19 +175,19 @@ const inputPhenomenon = ref(route.query.faultPhenomenon);
 const inputNotes = ref(route.query.notes);
 const clientName = route.query.clientName
 const equipmentId = route.query.equipmentId
-const qualityDate = ref(route.query.qualityDate)
+const protectTime = ref(route.query.protectTime)
 const status = ref(route.query.status)
-// 假设 qualityDate 和 signforDate 都是日期对象
+// 假设 protectTime 和 signforDate 都是日期对象
 var signforDate = new Date(route.query.signforDate);
 // 计算质保剩余时间
 const currentTime = new Date(); // 现在的时间
 const timeDifference = currentTime.getTime() - signforDate.getTime();
 // 将剩余时间转换为天数（或其他你需要的时间单位）
 const remainingDays = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-// 将结果赋值给 qualityDateLast
-const qualityDateLast = ref(qualityDate.value - remainingDays)
+// 将结果赋值给 protectTimeLast
+const protectTimeLast = ref(protectTime.value - remainingDays)
 var qualiyStatus = ref('')
-if (qualityDateLast.value > 0) {
+if (protectTimeLast.value > 0) {
   qualiyStatus.value = "在保"
 } else {
   qualiyStatus.value = "过保"
@@ -183,14 +213,10 @@ const form = reactive({
   repairNotes: '',
   repairWay: '现场维修'
 })
-var url = ref('')
-const fits = ['fill', 'contain', 'cover', 'none', 'scale-down']
 var imageUrls = ref([])
 const handleImageClick = (row: any) => {
   dialogImageVisible.value = true
   const imageVideo = row.imageVideo
-  // url.value = 'http://localhost:3000/DownloadAndUpload/faultImage/' + imageVideo
-  // dialogImageVisible.value = true
   imageUrls = imageVideo.map((fileName: string) => {
     return 'http://localhost:3000/DownloadAndUpload/faultImage/' + fileName;
   });
@@ -200,25 +226,45 @@ const handleImageCancel = () => {
   dialogImageVisible.value = false
 }
 
+const imageInitUrls = ref([])
+const ImageView = () => {
+  //得到最新的故障
+  const searchData = { equipmentId: equipmentId }
+  axiosServer.AxiosPost(qs.stringify(searchData), '/Equipment/EquipmentSearchImage').then((res) => {
+    const imageVideo = res
+    console.log('imageVideo', imageVideo)
+    imageInitUrls.value = imageVideo.map((fileName: string) => {
+      return 'http://localhost:3000/DownloadAndUpload/faultImage/' + fileName;
+    });
+  });
+}
+ImageView()
+
+const isImage = (url) => {
+  // 判断文件类型，这里简单地通过文件扩展名进行判断
+  const extension = url.split('.').pop().toLowerCase();
+  return ['jpg', 'jpeg', 'png', 'gif', 'jfif'].includes(extension);
+}
+
 //查询条件
 const dataSearch = () => {
   const searchData = { startDate: startDate.value, endDate: endDate.value, equipmentId: equipmentId }
-  axios({
-    url: "/Equipment/EquipmentDetail/RepairSearch",
-    data: searchData,
-    method: "post",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  }).then((res) => {
-    if (res.status == 200) {
-      //确认保存后，即使清空
-      tableData.value = res.data.map(item => {
-        item.repairDate = new Date(item.repairDate).toLocaleDateString()
-        item.faultDate = new Date(item.faultDate).toLocaleDateString()
-        return item;
-      });
-    }
+  axiosServer.AxiosPost(qs.stringify(searchData), '/Equipment/EquipmentDetail/RepairSearch').then((res) => {
+    repairCount.value = res.length
+    // 使用 reduce 方法对 contractMoney 字段进行相加
+    const totalContractMoney: number = res.reduce((sum, item) => {
+      console.log('', item)
+      const contractMoney = parseFloat(item.repairMoney) || 0; // 将字符串转换为数字，如果无法转换则为 0
+      return sum + contractMoney;
+    }, 0);
+    repairMoney.value = totalContractMoney
+
+    //确认保存后，即使清空
+    tableData.value = res.map(item => {
+      item.repairDate = new Date(item.repairDate).toLocaleDateString()
+      item.faultDate = new Date(item.faultDate).toLocaleDateString()
+      return item;
+    });
   });
 }
 
@@ -266,6 +312,7 @@ body,
 .dialog-inputs {
   margin-bottom: 20px;
 }
+
 .demo-image .block {
   padding: 30px 0;
   text-align: center;
@@ -275,9 +322,11 @@ body,
   box-sizing: border-box;
   vertical-align: top;
 }
+
 .demo-image .block:last-child {
   border-right: none;
 }
+
 .demo-image .demonstration {
   display: block;
   color: var(--el-text-color-secondary);

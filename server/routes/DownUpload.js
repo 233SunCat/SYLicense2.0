@@ -37,6 +37,12 @@ router.get('/faultImage/uploads/:filename', (req, res) => {
   console.log('imagePath',imagePath)
   res.sendFile(imagePath);
 });
-
+router.get('/faultImage/videos/:filename', (req, res) => {
+  const filename = req.params.filename;
+  console.log('视频filename',filename)
+  const imagePath = path.join(__dirname, '..', 'videos',filename);
+  console.log('imagePath',imagePath)
+  res.sendFile(imagePath);
+});
 
 module.exports = router;

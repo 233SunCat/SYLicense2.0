@@ -13,7 +13,7 @@ const EquipmentSchema = Mongoose.Schema({
         type: String,
         default: ""
     },
-    qualityDate: {
+    protectTime: {//质保期=年
         type: String,
     },
     signforDate: {//签收时间

@@ -47,7 +47,6 @@
 <script lang="ts" setup>
 import { ref, reactive } from 'vue'
 import axios from "axios";
-import ButtonUpload from '@/components/ButtonUpload.vue'
 import type { FormProps } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { Action } from 'element-plus'
@@ -62,7 +61,7 @@ const formInline = reactive({//这里就是获取的数据
     clientName: '',
     equipmentName: '',
     equipmentId: '',
-    faultDate: '',
+    faultDate: Date(),
     faultPhenomenon: '',
     notes: ''
 })
@@ -91,21 +90,19 @@ const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
         files.forEach((f) => {
             newFormData.append('files', f);
         });
-
         // 更新 uploadData
         uploadData = newFormData;
     }
 }
 const onSubmit = async () => {
-    console.log('uploadData', uploadData)
     //除上传图片，其他为空，则弹框，不请求
-    if (formInline.clientName == '' || formInline.equipmentName == '' || formInline.equipmentId == '' || formInline.faultDate == '' || formInline.faultPhenomenon == '' || formInline.notes == '') {
+    if (formInline.clientName == '' || formInline.equipmentName == '' || formInline.equipmentId == '' || formInline.faultDate == '' || formInline.faultPhenomenon == '') {
         ElMessageBox.alert('输入不能为空', '提示：', {
             confirmButtonText: '确认',
         })
         return;
     }
-    const checkresult = await axiosServer.AxiosPost(formInline, '/Equipment/CheckAndRetrieveQualityDate')
+    const checkresult = await axiosServer.AxiosPost(formInline, '/Equipment/CheckAndRetrieveprotectTime')
     if (checkresult.success == false) {
         ElMessage.error('添加失败，该设备并未中标！');
         return
@@ -116,9 +113,8 @@ const onSubmit = async () => {
     uploadData.append('faultDate', formInline.faultDate)
     uploadData.append('faultPhenomenon', formInline.faultPhenomenon)
     uploadData.append('notes', formInline.notes)
-    uploadData.append('qualityDate', checkresult.result.protectTime)
+    uploadData.append('protectTime', checkresult.result.protectTime)
     uploadData.append('signforDate', checkresult.result.signforDate)
-    console.log('uploadData', uploadData.values)
     axios(
         {
             url: '/Equipment/EquipmentSubmit',
