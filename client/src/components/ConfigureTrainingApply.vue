@@ -1,54 +1,23 @@
 <template>
   <div>
     <el-form :model="form" :inline="false" class="demo-form-inline" :label-position="labelPosition" label-width="120px">
-      <el-form-item label="技能训练"></el-form-item>
-      <el-form-item label="模块选择：">
-        <el-checkbox v-model="checkAll0" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选</el-checkbox>
-        <el-checkbox-group v-model="checkedCities0" @change="handleCheckedCitiesChange">
-          <el-checkbox v-for="city in cities0" :key="city" :label="city">{{
-            city
+      <div  :key="key" v-for="(item,key) in module">
+      <el-form-item :label="item.module">
+        <el-checkbox :v-model="checkAll[item.module]" :indeterminate="isIndeterminate" @change="handleCheckAllChange(item.module ,item.subModule)">全选</el-checkbox>
+        <el-checkbox-group v-model="checkedModule[item.module]" @change="handleCheckedCitiesChange(item.module, item.subModule)">
+          <el-checkbox  :key="subKey" :label="subItem" v-for="(subItem, subKey) in item.subModule">{{
+            subItem
           }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
       <el-form-item label="数量配置：">
-        <el-select v-model="selectedOption" placeholder="下拉框条件选择" size="mini">
+        <el-select v-model="selectModule[item.module]" placeholder="下拉框条件选择" size="mini" style="margin-right:20px">
           <el-option v-for="option in options" :key="option.value" :label="option.label" :value="option.value">
           </el-option>
         </el-select>
-        <el-input-number v-model="num0" :min="1" :max="99" />
+        <el-input-number v-model="numModule[item.module]" :min="1" :max="999" />
       </el-form-item>
-      <el-form-item label="缝合打结训练"></el-form-item>
-      <el-form-item label="模块选择：">
-        <el-checkbox v-model="checkAll1" :indeterminate="isIndeterminate">全选</el-checkbox>
-        <el-checkbox-group v-model="checkedCities1">
-          <el-checkbox v-for="city in cities1" :key="city" :label="city">{{
-            city
-          }}</el-checkbox>
-        </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="数量配置：">
-        <el-select v-model="selectedOption" placeholder="下拉框条件选择" size="mini">
-          <el-option v-for="option in options" :key="option.value" :label="option.label" :value="option.value">
-          </el-option>
-        </el-select>
-        <el-input-number v-model="num1" :min="1" :max="99" />
-      </el-form-item>
-      <el-form-item label="手术训练"></el-form-item>
-      <el-form-item label="模块选择：">
-        <el-checkbox v-model="checkAll2" :indeterminate="isIndeterminate">全选</el-checkbox>
-        <el-checkbox-group v-model="checkedCities2">
-          <el-checkbox v-for="city in cities2" :key="city" :label="city">{{
-            city
-          }}</el-checkbox>
-        </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="数量配置：">
-        <el-select v-model="selectedOption" placeholder="下拉框条件选择" size="mini">
-          <el-option v-for="option in options" :key="option.value" :label="option.label" :value="option.value">
-          </el-option>
-        </el-select>
-        <el-input-number v-model="num2" :min="1" :max="99"/>
-      </el-form-item>
+      </div>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">确认申请</el-button>
       </el-form-item>
@@ -61,7 +30,12 @@ import { ref, onMounted, reactive, inject } from "vue";
 import type { FormProps } from "element-plus";
 import { useRouter, useRoute } from 'vue-router';
 import axios from "axios";
-
+import axiosServer from '../assets/common/axios-server'
+import messageBox from '../assets/common/message-box'
+import funBox from '../assets/common/fun-box'
+import qs from 'qs'; // 引入 qs 库
+import { defineProps, defineEmits } from 'vue';
+var props = defineProps(['message'])
 const route = useRoute();
 const labelPosition = ref<FormProps["labelPosition"]>("right");
 const equipmentId = ref(route.query.equipmentId)
@@ -77,40 +51,94 @@ const form = reactive({
   checked1: false,
   checked2: false
 })
-const checkAll0 = ref(false)
-const checkAll1 = ref(false)
-const checkAll2 = ref(false)
+const checkAll = ref({})
+const checkedModule = ref({})
+const numModule =ref({})
+const selectModule =ref({})
+const isIndeterminate = ref(false)
 
-const isIndeterminate = ref(true)
-const checkedCities0 = ref(['镜头训练', '分离训练'])
-const cities0 = ['镜头训练', '分离训练', 'FLS技能训练', '剪切训练', '钛夹训练', '电凝训练', '双手合作训练', '抓取训练']
-const checkedCities1 = ref(['缝合训练', '打结训练'])
-const cities1 = ['缝合训练', '打结训练']
-const checkedCities2 = ref(['胆囊胆道手术', '打结训练'])
-const cities2 = ['胆囊胆道手术', '打结训练', '妇科手术', '阑尾切除手术', '乙状结肠切除手术']
-
-const selectedOption = ref("");
 const options = ref([
   { label: "不限制", value: "不限制" },
+  { label: "限制", value: "限制" },
   // 其他选项...
 ]);
-const num0 = ref(1)//数量配置
-const num1 = ref(1)//数量配置
-const num2 = ref(1)//数量配置
+/**
+ * 初始化模块下拉框和训练次数
+ */
+const SelectAndNumInit = (data) => {
+//
+  console.log('data',data)
+  data.forEach(element => {
+    selectModule.value[element.module]  =  '不限制'
+  });
+  data.forEach(element => {
+    numModule.value[element.module]  =  999
+  });
+  console.log('selectModule',selectModule.value)
+}
 
 //获取所有选择，点击申请
 const onSubmit = () =>{
-  checkedCities0
-  num0
+  const result = Object.keys(selectModule.value).map((module: string) => ({
+    module: module,
+    moduleSelect: selectModule.value[module],
+    moduleNum: numModule.value[module],
+    moduleSub: checkedModule.value[module]
+  }));
+  const formData = reactive({
+    applyNameApply: props.message.applyNameApply,
+    applyDateApply: props.message.applyDateApply,
+    modelModuleAllocation: result
+  })
+    axiosServer.AxiosPost(qs.stringify(formData), '/Model/AddmodelModuleAllocation').then(res => {
+    if (res.success == true) {
+        messageBox.MessageBox('保存成功')
+    } else {
+      messageBox.MessageBox('保存失败')
+    }
+  })
+
 }
 
-const handleCheckAllChange = (val: boolean) => {
-  checkedCities0.value = val ? cities0 : []
-  isIndeterminate.value = false
+const handleCheckAllChange = (module,subModule) => {
+    if(checkAll.value[module] == false){
+      checkAll.value[module] = true
+    }else{
+      checkAll.value[module] = false
+    }
+    checkedModule.value[module] = checkAll.value[module] ? subModule : []
+    isIndeterminate.value = false
+    // 在这里可以使用 selectAll 参数
+
 }
-const handleCheckedCitiesChange = (value: string[]) => {
-  const checkedCount = value.length
-  checkAll0.value = checkedCount === cities0.length
-  isIndeterminate.value = checkedCount > 0 && checkedCount < cities0.length
+
+const module = ref([])
+const ModuleXml = () => {
+    axiosServer.AxiosGet( '/Model/ModelModuleXmlObject').then(res=>{
+      console.log('res',res)
+        module.value = res
+        module.value.forEach(item => {
+        checkAll.value[item.module] = false
+        })
+        SelectAndNumInit(res)
+        const formData = reactive({
+          applyNameApply: props.message.applyNameApply,
+          applyDateApply: props.message.applyDateApply,
+        })
+        axiosServer.AxiosPost(qs.stringify(formData), '/Model/GetMTapplyModule').then(resArry => {
+          const modelModuleApply = resArry.pop().modelModuleApply
+          const result = {};
+
+          // 遍历data1，匹配data2，合并到result中
+          module.value.forEach(item => {
+              const moduleName = item.module;
+              const matchedSubModules = item.subModule.filter(subModule => 
+                modelModuleApply.includes(subModule));
+              checkedModule.value[moduleName] = matchedSubModules;
+          });
+  })
+    })
 }
+ModuleXml()
+
 </script>

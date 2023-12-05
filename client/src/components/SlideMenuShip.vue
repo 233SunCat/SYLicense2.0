@@ -124,7 +124,6 @@ const YearMonTurn = (collection) => {
  */
 const ShipMenuSlide = () => {//返回时间，用户
   axiosServer.AxiosGet('/ShipClient/ShipMenu').then(collection => {
-
     menus.value = fenlei(YearMonTurn(collection))
   })
 }
@@ -136,6 +135,7 @@ ShipMenuSlide()
 const handleMenuItemClick = (menuItem: any) => {
   //emit('add', shuzu)
   // 这里处理菜单项的点击事件  
+  console.log('点击侧边栏')
   EventBus.emit("slide-ship", { clientName: menuItem.clientName, orderDate: menuItem.orderDate, equipmentIds: menuItem.equipmentId ,orderStatus:menuItem.orderStatus});
   EventBus.emit("slide-ship-order", { clientName: menuItem.clientName, orderDate: menuItem.orderDate,orderStatus:menuItem.orderStatus});
 }

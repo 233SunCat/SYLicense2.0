@@ -1,5 +1,5 @@
 <template>
-    <div class="common-layout" style="height: 100%;">
+    <div class="common-layout" style="height: 110%;">
         <el-container style="height: 100%;">
             <el-header style="background-color: #f6f8f8; display: flex; align-items: center; ">
                 <el-text class="mx-1" size="large">用户信息</el-text>
@@ -66,7 +66,9 @@ import dayjs from 'dayjs'
 //数据
 const defaultTime = new Date(2000, 1, 1, 12, 0, 0)
 const labelPosition = ref<FormProps['labelPosition']>('right')
-var module = constants.Module
+//var module = constants.Module
+// const module = Object.values(constants.Modules).reduce((acc, curr) => acc.concat(curr), []);
+
 var equipmentFunctions = constants.selectModelFunctions
 var equipmentNames = constants.selectModelName
 const checkAll = ref(false)
@@ -79,7 +81,7 @@ const getDefaultFormInline = () => {
     modelNameApply: '',
     arrivalDateApply: new Date(),
     arrivalLocationApply: '',
-    modelModuleApply: module.length !== 0 ? module.slice(0, 2) : [],
+    modelModuleApply:[],
     applyDateApply: dayjs(Date()).format("YYYY-MM-DD hh:mm:ss"),
     applyStatusApply: '待审核'
   };
@@ -90,13 +92,13 @@ const isIndeterminate = ref(true)
 
 //事件
 const handleCheckAllChange = (val: boolean) => {
-    formInline.modelModuleApply = val ? module : []
+    formInline.modelModuleApply = val ? module.value : []
     isIndeterminate.value = false
 }
 const handleCheckedCitiesChange = (value: string[]) => {
     const checkedCount = value.length
-    checkAll.value = checkedCount === module.length
-    isIndeterminate.value = checkedCount > 0 && checkedCount < module.length
+    checkAll.value = checkedCount === module.value.length
+    isIndeterminate.value = checkedCount > 0 && checkedCount < module.value.length
 }
 const eamilSubmit = () => {//发送请求
     console.log('formInline',formInline)
@@ -111,6 +113,16 @@ const eamilSubmit = () => {//发送请求
     }
   })
 }
+
+
+//处理xml文件
+const module = ref([])
+const ModuleXml = () => {
+    axiosServer.AxiosGet( '/Model/ModelModuleXml').then(res=>{
+        module.value = res
+    })
+}
+ModuleXml()
 </script>
   
 <style>

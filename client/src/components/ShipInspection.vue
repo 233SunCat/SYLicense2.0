@@ -28,12 +28,18 @@
             <el-form-item label="验收日期">
               <el-date-picker style="width: 100%" v-model="formInline.acceptDate" type="date" clearable :disabled="disabled" />
             </el-form-item>
-            <el-form-item label="验收单">
-              <el-button style="width: 100%;" class="mb-4" :disabled="disabled">
-                <el-icon>
-                  <UploadFilled />
-                </el-icon>
-                上传验收单</el-button>
+            <el-form-item>
+                  <el-upload v-model:file-list="fileList" class="upload-demo"
+                  action="http://localhost:3000/shipInspection/inspectionUpload" 
+                  :data="uploadData"
+                  :limit="3"
+                  multiple
+                  :on-change="handleChange" 
+                  :before-upload="beforeUpload"
+                  :on-remove="handleRemove"
+                  :on-preview="openPreview">
+                        <el-link type="primary">上传相关附件</el-link>
+                </el-upload>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="onSubmit" :disabled="disabled">确认保存</el-button>
@@ -58,6 +64,7 @@ import axiosServer from '../assets/common/axios-server'
 import qs from 'qs'; // 引入 qs 库
 import messageBox from '../assets/common/message-box'
 import funBox from '../assets/common/fun-box'
+import { ElMessage } from 'element-plus';
 
 const labelPosition = ref<FormProps["labelPosition"]>("right");
 const formInline = reactive({
@@ -70,7 +77,8 @@ const formInline = reactive({
 var  orderDate  = null
 var clientName = ''
 const formInlineCopy = formInline
-
+const fileList = ref<UploadUserFile[]>([
+])
 const onSubmit = () => {
   const formInlineFields = Object.keys(formInline);  
   if(funBox.checkRequiredFields(formInline, formInlineFields)){return}
@@ -84,13 +92,95 @@ const onSubmit = () => {
     }
   })
 };
-EventBus.on('slide-ship-order', async (val: any) => {
+var uploadData;
+
+const handerBus = async (val: any) => {
     orderDate = val.orderDate
     clientName = val.clientName
+    //EventBus.off('slide-ship-order', handerBus)
+    uploadData = {orderDate:orderDate ,clientName:clientName}
+    await handleLoad()
     axiosServer.AxiosPost(val,'/ShipClient/GetShipAccept').then(res=>{
       Object.assign(formInline, funBox.FormDisplay(res,formInline,formInlineCopy));
     })
-})
+}
+EventBus.on('slide-ship-order', handerBus)
+/**
+ * 上传文件
+ */
+ const handleChange = async (file, fileList) => {
+  //fileList.value = fileList.value.slice(-3)
+  // 处理上传结果
+  if (file.status === 'success') {
+    // 显示上传成功的提示
+    ElMessage.success('文件 上传成功!');
+  } else if (file.status === 'error') {
+    // 显示上传失败的提示
+    ElMessage.error('文件 上传失败，请重试或联系管理员!');
+  }
+  await handleLoad()
+};
+/**
+ * 
+ */
+const handleRemove = async(file, fileList) =>{
+    console.log('file',file)
+    const  uploadData = {orderDate:orderDate ,clientName:clientName,fileName: file.name}
+    await axiosServer.AxiosPost(uploadData,'/shipInspection/inspectionRemove')
+    await handleLoad()
+}
+/**
+ * 加载文件列表
+ */
+const handleLoad = () => {
+    const  uploadData = {orderDate:orderDate ,clientName:clientName}
+    axiosServer.AxiosPost(uploadData,'/shipInspection/inspectionLoad').then(res =>{
+      console.log('文件列表',res)
+      fileList.value = res.map(fileName => ({ name: fileName, url: 'http://localhost:3000/DownloadAndUpload/faultImage/shipInspection/'+ fileName }));
+    })
+}
+/**
+ * 预览
+ */
+const openPreview = (file) =>  {
+      // 在这里添加打开预览页面的逻辑，可以使用 window.open 或者路由跳转
+    const  uploadData = {orderDate:orderDate ,clientName:clientName}
+    axiosServer.AxiosPost(uploadData,'/shipInspection/inspectionLoad').then(res =>{
+      fileList.value = res.map(fileName => ({ name: fileName, url: 'http://localhost:3000/DownloadAndUpload/faultImage/shipInspection/'+ fileName }));
+      if(fileList.value.length != 0){
+        fileList.value.forEach(item =>{
+          if(file.name === item.name){
+                const previewUrl = item.url; // 这里假设取第一个文件的 URL
+                console.log('文件的链接',previewUrl)
+                window.open(previewUrl, '_blank'); // 在新窗口中打开预览页面
+          }
+        })
+      }
+    })
+
+}
+const beforeUpload = (file) => {
+      // 在这里可以配置额外的参数
+      const additionalParams = {
+        orderDate: orderDate,
+        clientName: clientName,
+      };
+
+      // 将额外参数添加到 FormData 中
+      const formData = new FormData();
+      Object.keys(additionalParams).forEach((key) => {
+        formData.append(key, additionalParams[key]);
+      });
+
+      // 将 FormData 赋值给 file 对象的 request 属性
+      file.request = {
+        headers: {}, // 可以添加其他请求头配置
+        data: additionalParams,
+      };
+
+      return true; // 返回 true 表示继续上传，返回 false 则取消上传
+}
+
 </script>
     
 <style>

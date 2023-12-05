@@ -11,7 +11,7 @@ const checkRequiredFields = (formInline: Record<string, any>, requiredFields: st
 };
 const FormDisplay = (data: any, formInline: any, formInlineCopy: any) => {
   if (data.length !== 0) {
-    const latestData = data.pop();
+    const latestData = data[0];
 
     // 根据 receivingName 判断是否禁用
     //disabled.value = latestData.receivingName === '';

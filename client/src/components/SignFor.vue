@@ -28,11 +28,10 @@
               <el-date-picker style="width: 100%" v-model="formInline.signforDate" type="date" clearable  :disabled="disabled"/>
             </el-form-item>
             <el-form-item label="是否在库">
-              <el-checkbox-group v-model="formInline.inventoryStatus" :disabled="disabled">
-                <el-checkbox v-for="city in cities" :key="city" :label="city">{{
-                  city
-                }}</el-checkbox>
-              </el-checkbox-group>
+              <el-radio-group v-model="inventoryStatus" class="ml-4">
+                <el-radio label="是" size="large">是</el-radio>
+                <el-radio label="否" size="large">否</el-radio>
+              </el-radio-group>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="onSubmit" :disabled="disabled">确认保存</el-button>
@@ -64,35 +63,19 @@ const formInline = reactive({
   signforName: "",
   signforPhone: "",
   signforDate: null,
-  inventoryStatus:['是']
-
+  inventoryStatus:'是'
 });
-var cities = ['是', '否']
-var status = 1;
-
-const change = () => {//判断是否在库
-  if (formInline.inventoryStatus.length == 0 || formInline.inventoryStatus.length == 2) {
-    status = 0;
-    messageBox.MessageBox("错误只能单选")
-    return;
-  }
-}
+const inventoryStatus = ref('是')
 const formInlineCopy = formInline
 
 var  orderDate  = null
 var clientName = ''
 const onSubmit = () => {
-  status = 1;
-  change();
-  if (status == 0) {
-    return;
-  } else {
-    formInline.formInline.inventoryStatus = formInline.inventoryStatus.value[0];
-  }
   const formInlineFields = Object.keys(formInline);  
   if(funBox.checkRequiredFields(formInline, formInlineFields)){return}
   formInline.orderDate = orderDate
   formInline.clientName = clientName
+  formInline.inventoryStatus = inventoryStatus.value
   axiosServer.AxiosPost(qs.stringify(formInline), '/ShipClient/AddSignfor').then(res => {
     if (res.success == true) {
       messageBox.MessageBox('保存成功')
@@ -101,13 +84,18 @@ const onSubmit = () => {
     }
   })
 };
-EventBus.on('slide-ship-order', async (val: any) => {
+const handerBus = async (val: any) => {
     orderDate = val.orderDate
     clientName = val.clientName
+    //EventBus.off('slide-ship-order', handerBus)
     axiosServer.AxiosPost(val,'/ShipClient/GetSignfor').then(res=>{
+      if(res.length != 0){
+        inventoryStatus.value = res[0].inventoryStatus
+      }
       Object.assign(formInline, funBox.FormDisplay(res,formInline,formInlineCopy));
     })
-})
+}
+EventBus.on('slide-ship-order', handerBus)
 </script>
   
 <style>

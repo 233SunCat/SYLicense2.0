@@ -125,8 +125,8 @@ const ShipClient = Mongoose.Schema({
     default: null
   },
   inventoryStatus:{//是否在库
-    type: [String],
-    default: ['']
+    type: String,
+    default: ''
   },  
   acceptName:{//验收方姓名
     type: String,
@@ -140,6 +140,10 @@ const ShipClient = Mongoose.Schema({
     type: Date,
     default: null
   },
+  inspectionFiles:{//验收单文件
+    type: [String],
+    default: []
+  },
   dealer:{//代理商信息
     type: String,
     default: ""
@@ -151,6 +155,10 @@ const ShipClient = Mongoose.Schema({
   contractMoney:{//合同签订金额
     type: String,
     default: ""
+  },
+  contractFiles:{//合同文件
+    type: [String],
+    default: []
   },
   paymentDate:{//付款日期
     type: Date,

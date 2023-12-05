@@ -43,7 +43,7 @@
             <el-form-item>
               <el-button type="primary" @click="onSubmit">配置训练模块</el-button>
               <el-dialog v-model="dialogFormVisible" title="维修记录">
-                <ConfigureTrainingApply />
+                <ConfigureTrainingApply :message="parentMessage"/>
               </el-dialog>
             </el-form-item>
             <el-form-item>
@@ -71,7 +71,6 @@ import funBox from '../assets/common/fun-box'
 const labelPosition = ref<FormProps['labelPosition']>('right')
 
 const route = useRoute();
-
 const moduleAdd = ref([""]);
 const moduleMinus = ref([""]);
 var dialogFormVisible = ref(false)
@@ -82,6 +81,7 @@ const modelMessage = ref([])
 
 const applyNameApply = route.query.applyNameApply
 const applyDateApply = route.query.applyDateApply
+const parentMessage = {applyNameApply:applyNameApply,applyDateApply:applyDateApply}
 
 const getDefaultFormInline = () => {
   return {

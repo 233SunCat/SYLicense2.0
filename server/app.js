@@ -11,6 +11,7 @@ var shipRouter = require('./routes/ShipClient');
 var loginRouter = require('./routes/Login')
 var downupRouter = require('./routes/DownUpload')
 var shipContractsRouter = require('./routes/ShipContracts')
+var shipInspectionRouter = require('./routes/ShipInspection')
 
 const MongodbInit = require("./controller/MongodbInit")
 const bodyParser = require('body-parser');
@@ -37,6 +38,8 @@ app.use('/ShipClient',shipRouter);
 app.use('/Login',loginRouter);
 app.use('/DownloadAndUpload',downupRouter);
 app.use('/shipContracts',shipContractsRouter);
+app.use('/shipInspection',shipInspectionRouter);
+
 
 app.all('*', function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')

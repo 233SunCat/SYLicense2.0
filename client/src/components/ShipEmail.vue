@@ -165,13 +165,15 @@ const onSubmit = () => {
 /**
  * 加载
  */
-EventBus.on('slide-ship-order', async (val: any) => {
+ const handerBus = async (val: any) => {
   orderDate = val.orderDate
   clientName = val.clientName
+  //EventBus.off('slide-ship-order', handerBus)
   axiosServer.AxiosPost(val, '/ShipClient/GetShipEmail').then(res => {//res = [],如果id存在[{}...]，id不存在[]
     Object.assign(formInline, funBox.FormDisplay(res,formInline,formInlineCopy));
   })
-})
+}
+EventBus.on('slide-ship-order', handerBus)
 </script>
 <style>.demo-form-inline .el-input {
   --el-input-width: 220px;

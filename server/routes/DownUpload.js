@@ -8,7 +8,7 @@ const storage = multer.diskStorage({
     cb(null, './downloads')
   },
   filename(req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname)
+    cb(null, file.originalname)
   }
 })
 const upload = multer({ storage })
@@ -17,7 +17,6 @@ const upload = multer({ storage })
 router.use(cors());
 router.get('/SYGenInfo', (req, res) => {
   const filePath = path.join(__dirname, '..', 'downloads', 'SYGenInfo.exe');
-  console.log('filePath', filePath)
   res.download(filePath, 'SYGenInfo.exe', (err) => {
     if (err) {
       console.error('File download error:', err);
@@ -39,10 +38,17 @@ router.get('/faultImage/uploads/:filename', (req, res) => {
 });
 router.get('/faultImage/videos/:filename', (req, res) => {
   const filename = req.params.filename;
-  console.log('视频filename',filename)
   const imagePath = path.join(__dirname, '..', 'videos',filename);
-  console.log('imagePath',imagePath)
   res.sendFile(imagePath);
 });
-
+router.get('/faultImage/shipContracts/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const imagePath = path.join(__dirname, '..', 'shipContracts',filename);
+  res.sendFile(imagePath);
+});
+router.get('/faultImage/shipInspection/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const imagePath = path.join(__dirname, '..', 'shipInspection',filename);
+  res.sendFile(imagePath);
+});
 module.exports = router;

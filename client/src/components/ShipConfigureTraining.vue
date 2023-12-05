@@ -1,5 +1,5 @@
 <template>
-  <div class="common-layout" style="height: 100%;">
+  <div class="common-layout">
     <el-container style="height: 100%;">
       <el-header style="background-color: #f6f8f8; display: flex; align-items: center; ">
         <el-text class="mx-1" size="large">设备信息</el-text>
@@ -28,6 +28,7 @@
                       <el-option v-for="item in selectEquipmentName" :label="item" :value="item" :key="item" />
                     </el-select>
                   </el-form-item>
+                  <br/>
                   <el-form-item label="确定">
                     <el-button type="info" @click="EquipmentSelect(equipmentSelect)">确定</el-button>
                   </el-form-item>
@@ -38,15 +39,14 @@
                   :disabled="netDisabled" clearable />
               </el-form-item>
               <el-form-item label="模块选择：">
-                <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange"
-                  :disabled="netDisabled">全选</el-checkbox>
-                <el-checkbox-group v-model="formInline.equipmentModule" @change="handleCheckedCitiesChange"
-                  :disabled="netDisabled">
-                  <el-checkbox v-for="item in cities" :key="item" :label="item">{{
-                    item
-                  }}</el-checkbox>
-                </el-checkbox-group>
-              </el-form-item>
+                            <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate"
+                                @change="handleCheckAllChange">全选</el-checkbox>
+                            <el-checkbox-group v-model="formInline.equipmentModule" @change="handleCheckedCitiesChange">
+                                <el-checkbox v-for="item in module" :key="item" :label="item">{{
+                                    item
+                                }}</el-checkbox>
+                            </el-checkbox-group>
+                        </el-form-item>
               <el-form-item label="设备数量/台：">
                 <el-input style="width: 100%;" v-model="formInline.equipmentNumber" placeholder="设备数量" clearable
                   @input="InputChange(formInline.equipmentNumber)" :disabled="netDisabled" />
@@ -57,8 +57,10 @@
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click="EquipmentSubmit" :disabled="netDisabled">确认保存</el-button>
-                <el-button type="primary" :disabled="netDisabled">取消</el-button>
               </el-form-item>
+              <el-form-item>
+                <el-button type="primary" :disabled="netDisabled">取消</el-button>              
+              </el-form-item>                
             </el-form>
           </el-col>
           <el-col :span="12">
@@ -116,7 +118,7 @@ const selectEquipmentName = constants.selectEquipmentName
 var dialogFormVisible = ref(false)
 var dialogEqAdd = ref(false)
 const equipmentSelect = ref('')
-const netDisabled = ref(true)
+const netDisabled = ref(false)
 const addDisabled = ref(false)
 const labelPosition = ref<FormProps['labelPosition']>('right')
 type Equipment = {
@@ -154,7 +156,14 @@ const formInline = reactive<FormInlineData>({//这里就是获取的数据
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
 const cities = constants.Module
-
+//处理xml文件
+const module = ref([])
+const ModuleXml = () => {
+    axiosServer.AxiosGet( '/Model/ModelModuleXml').then(res=>{
+        module.value = res
+    })
+}
+ModuleXml()
 /**
  * 
  * 输入框触发
@@ -315,7 +324,6 @@ const EquipmentSubmit = () => {//保存失败弹框
   //发送请求.
   axiosServer.AxiosPost(qs.stringify(newfornInline), '/ShipClient/AddShipEquipment').then(res => {
     if (res.success == true) {
-
       messageBox.MessageBox('保存成功')
     } else {
       messageBox.MessageBox('保存失败')
@@ -327,31 +335,44 @@ const EquipmentSubmit = () => {//保存失败弹框
  * @param item 
  */
 const HandleFormSearch = (item) => {//内存表单查询
+  console.log('查看设备',item)
   formInline.equipmentIds = []
   formInline.equipmentNumber = item.equipmentNumber
   formInline.equipmentStyle = item.equipmentStyle
   formInline.equipmentModule = item.equipmentModule
+  formInline.equipmentName = item.equipmentName
   item.equipmentIds.forEach((res, index) => {
     formInline.equipmentIds.push(res)
   })
-  NetDisable();
+  //NetDisable();
+  NotNetDisable()
 }
 
 /**
  * 直接加载
  */
-EventBus.on('slide-ship-order', async (val: any) => {
+const handerBus = async (val: any) => {
+  console.log('发货配置器')
   NetDisable();
-  console.log('val', val)
   formInline.clientName = val.clientName
   formInline.orderDate = val.orderDate
   formInline.orderStatus = val.orderStatus
+  formInline.equipmentNumber = ''
+  formInline.equipmentStyle = ''
+  formInline.equipmentModule = []
+  formInline.equipmentName = ''
+  formInline.equipmentIds = []
+
+  //EventBus.off('slide-ship-order', handerBus)
+  console.log('formInline',formInline)
   axiosServer.AxiosPost(val, '/ShipClient/GetShipEquipmentNames').then(res => {//res = [],如果id存在[{}...]，id不存在[]
     const data = formMap(res)
     const formData = processEquipmentData(data)
     processEquipmentButton(formData)
   })
-})
+}
+EventBus.on('slide-ship-order', handerBus)
+
 </script>
   
 <style lang="less">

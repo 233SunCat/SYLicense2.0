@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%">
+  <div class="common-layout" style="width: 100%">
     <!-- 检索条件一排显示 -->
     <div style="width: 100%">
       <!-- 检索条件一排显示 -->
@@ -63,6 +63,7 @@ import funBox from '../assets/common/fun-box'
 import messageBox from '../assets/common/message-box'
 // 定义数据
 const startDate = ref(new Date());
+startDate.value.setMonth(startDate.value.getMonth() - 1);
 const endDate = ref(new Date());
 var dialogFormVisible = ref(false)
 var parentMessage = {};
@@ -133,8 +134,10 @@ const EventAdd = () => {
   parentMessage = { clientName: clientName, orderDate: orderDate }
   //EventBus.emit("slide-ship-event", { clientName: clientName, orderDate: orderDate});
 }
-EventBus.on('slide-ship-order', async (val: any) => {
+const handerBus = async (val: any) => {
   orderDate = val.orderDate
   clientName = val.clientName
-})
+  //EventBus.off('slide-ship-order', handerBus)
+}
+EventBus.on('slide-ship-order', handerBus)
 </script>

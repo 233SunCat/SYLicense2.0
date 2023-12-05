@@ -34,30 +34,67 @@
     <el-table :data="tableData" style="width: 100%">
       <!-- 表格列定义 -->
       <!-- <el-table-column prop="name" label="序号"></el-table-column> -->
-      <el-table-column prop="modelApplyName" label="模块训练申请人"></el-table-column>
-      <el-table-column prop="applyDate" label="申请时间"></el-table-column>
+      <el-table-column prop="applyNameApply" label="模块训练申请人"></el-table-column>
+      <el-table-column prop="applyDateApply" label="申请时间"></el-table-column>
       <el-table-column prop="wxID" label="微信ID"></el-table-column>
-      <el-table-column prop="modelName" label="设备名场"></el-table-column>
-      <el-table-column prop="cpuSerialNumber" label="处理器序列号"></el-table-column>
-      <el-table-column prop="diskSerialNumber" label="硬盘序列号"></el-table-column>
-      <el-table-column prop="approvalStatus" label="审核状态"></el-table-column>
+      <el-table-column prop="modelNameApply" label="设备名称"></el-table-column>
+      <el-table-column prop="processorSerialNumber" label="处理器序列号"></el-table-column>
+      <el-table-column prop="hardDriveSerialNumber" label="硬盘序列号"></el-table-column>
+      <el-table-column prop="applyStatusApply" label="审核状态"></el-table-column>
       <el-table-column prop="operation" label="操作">
         <template #default="scope">
-          <!-- 按钮，点击后跳转到其他页面 -->
-          <!-- <router-link style="  text-decoration: none;" to="/Equipment/EquipmentDetail">
-            <el-button type="success" plain @click="handleRowClick(scope.row)">查看详情</el-button>
-            </router-link> -->
-          <el-button v-if="scope.row.approvalStatus === '通过'" type="success" plain @click="handleDetailsClick(scope.row)">
+          <el-button v-if="scope.row.applyStatusApply === '通过' || scope.row.applyStatusApply === '拒绝'" type="success" plain @click="handleRowClick(scope.row)">
             查看详情
           </el-button>
-          <el-button v-else-if="scope.row.approvalStatus === '待审核'" type="primary" plain
-            @click="handleAuditClick(scope.row)">
+          <el-button v-else-if="scope.row.applyStatusApply === '待审核'" type="primary" plain
+            @click="handleRowClick(scope.row)">
             审核
           </el-button>
         </template>
       </el-table-column>
       <!-- 其他表格列... -->
     </el-table>
+                  <el-dialog v-model="dialogFormVisible" title="申请详情">
+            <div class="common-layout" style="height: 100%">
+            <div style="height:60px;display: flex; align-items: center; justify-content: center;">
+              <el-text class="line-break" size="large">申请模块详情</el-text>
+            </div>
+            <div style="height:60px;">
+              <el-text class="line-break" size="large">申请状态: {{applyStatusApply}}</el-text>
+            </div>
+            <div style="height:60px;">
+              <el-text class="line-break" size="large" style="margin-right:20px">申请人-{{applyNameApply}}</el-text>
+              <el-text class="line-break" size="large" style="margin-right:20px">设备名称-{{modelNameApply}}</el-text>
+              <el-text class="line-break" size="large" style="margin-right:20px">申请时间-{{applyDateApply}}</el-text>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: center;">
+            <el-form
+              class="demo-form-inline"
+              :label-position="labelPosition"
+              label-width="120px"
+              style="max-width: 100%; width: 80%"
+            >
+              <el-form-item
+                :label="item.module+': '+item.moduleNum+'次'"
+                v-for="(item, key) in moduleMap"
+                :key="key"
+                style="background-color: #f0f3f4"
+              >
+                <div style="width: 100%; height: 20px"></div>
+                <el-row :gutter="10" style="width: 100%">
+                  <el-col :span="6" v-for="(subitem,subkey) in item.moduleSub" :key="subkey">
+                    <el-button type="info">{{ subitem }}</el-button>
+                  </el-col>
+                </el-row>
+              </el-form-item>             
+              <el-form-item>
+                <el-button type="primary" @click="onSucsess" :disabled="disabled">确认通过</el-button>
+                <el-button type="primary" @click="onRefuse" :disabled="disabled">拒绝</el-button>
+              </el-form-item>
+            </el-form>
+            </div>
+          </div>
+        </el-dialog>
   </div>
 </template>
     
@@ -68,6 +105,11 @@ import { ElButton } from "element-plus";
 import XLSX from "xlsx";
 import { useRouter } from "vue-router";
 import axios from "axios";
+import axiosServer from '../assets/common/axios-server'
+import qs from 'qs'; // 引入 qs 库
+import dayjs from 'dayjs'
+import messageBox from '../assets/common/message-box'
+import funBox from '../assets/common/fun-box'
 
 // 定义数据
 const keyword = ref("");
@@ -79,99 +121,86 @@ const options = ref([
   { label: "通过", value: "通过" },
   // 其他选项...
 ]);
-
 const tableData = ref([]);
-const filterData = () => {
-  // 在这里根据关键字、下拉框选项、起始日期和结束日期对数据进行筛选
-  // 筛选后的数据存储在tableData中，表格会自动更新显示筛选后的数据
-};
 
+const dialogFormVisible = ref(false)
+const moduleMap = ref([]);                       
+
+
+
+//表格跳转
+const disabled = ref(false)
+var applyDateApply = ref()
+var applyNameApply = ref()
+var applyStatusApply = ref()
+var modelNameApply = ref()
+const handleRowClick = (row: any) => {
+  console.log('加载审批1111111111')
+  dialogFormVisible.value = true
+  applyDateApply.value = row.applyDateApply
+  applyNameApply.value = row.applyNameApply
+  applyStatusApply.value = row.applyStatusApply
+  modelNameApply.value = row.modelNameApply
+  disabled.value = false
+  if(row.applyStatusApply != '待审核'){
+    disabled.value = true
+  }
+    const formData = reactive({
+    applyNameApply: row.applyNameApply,
+    applyDateApply: row.applyDateApply
+  })
+  console.log('formData',formData)
+    axiosServer.AxiosPost(qs.stringify(formData), '/Model/GetmodelModuleAllocation').then(res => {
+      moduleMap.value = res.pop().modelModuleAllocation
+      console.log('moduleMap',moduleMap.value)
+
+  })
+}
+
+const onSucsess = () => {//同意
+    var formInline = reactive({
+      applyDateApply : applyDateApply.value,
+      applyNameApply : applyNameApply.value,
+      applyStatusApply : '通过'
+    })
+    axiosServer.AxiosPost(qs.stringify(formInline), '/Model/AddMTapplyApproval').then(res => {
+      if (res.success == true) {
+        messageBox.MessageBox('保存成功')
+        dataSearch()//刷新
+      } else {
+        messageBox.MessageBox('保存失败')
+      }
+    })
+}
+const onRefuse = () => {
+    var formInline = reactive({
+      applyDateApply : applyDateApply,
+      applyNameApply : applyNameApply,
+      applyStatusApply : '拒绝'
+    })
+    axiosServer.AxiosPost(qs.stringify(formInline), '/Model/AddMTapplyApproval').then(res => {
+      if (res.success == true) {
+        messageBox.MessageBox('保存成功')
+        dataSearch()
+      } else {
+        messageBox.MessageBox('保存失败')
+      }
+    })
+}
 var searchData = new FormData();
 //查询条件
 
 const router = useRouter();
 var uploadData = new FormData();
-//表格跳转
-const handleRowClick = (row: any) => {
-  // 处理按钮点击事件，跳转到其他页面
-  console.log("输出跳转页面事件");
-  uploadData.append("equipmentId", row.equipmentId);
-  //点击的向服务端发送请求拿到数据之后跳转
-  axios({
-    url: "/Equipment/EquipmentDetail",
-    data: { equipmentId: row.equipmentId },
-    method: "post",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  }).then((res) => {
-    if (res.status != 500 && res.data) {
-      const data = res.data[0];
-      router.push({
-        path: "/Equipment/EquipmentDetail",
-        query: {
-          faultDate: data.faultDate,
-          faultPhenomenon: data.faultPhenomenon,
-          notes: data.notes,
-          equipmentId: row.equipmentId,
-        },
-        // 多个参数这样的写法
-        // query:{Shuju}
-      });
-    }
-  });
-};
+
 //通信
-const dataSearch = () => {
-  // const searchData = { keyword: keyword.value, selectedOption: selectedOption.value, startDate: startDate.value, endDate: endDate.value }
-  // axios({
-  //   url: "/Equipment/EquipmentSearch",
-  //   data: searchData,
-  //   method: "post",
-  //   headers: {
-  //     "Content-Type": "application/x-www-form-urlencoded",
-  //   },
-  // }).then((res) => {
-  //   if (res.status == 200) {
-  //     //确认保存后，即使清空
-  //     tableData.value = res.data.map(item => {
-  //       item.faultDate = new Date(item.faultDate).toLocaleDateString();
-  //       return item;
-  //     });
-  //   }
-  // });
-  const data = [
-    {
-      modelApplyName: "John Doe",
-      applyDate: "2023-11-21",
-      wxID: "john_doe123",
-      modelName: "ProductX",
-      cpuSerialNumber: "ABC123",
-      diskSerialNumber: "XYZ789",
-      approvalStatus: "通过",
-      operation: "View Details",
-    },
-    {
-      modelApplyName: "Jane Smith",
-      applyDate: "2023-11-22",
-      wxID: "jane_smith456",
-      modelName: "ProductY",
-      cpuSerialNumber: "DEF456",
-      diskSerialNumber: "UVW987",
-      approvalStatus: "待审核",
-      operation: "Edit",
-    },
-    {
-      modelApplyName: "Bob Johnson",
-      applyDate: "2023-11-23",
-      wxID: "bob_johnson789",
-      modelName: "ProductZ",
-      cpuSerialNumber: "GHI789",
-      diskSerialNumber: "LMN654",
-      approvalStatus: "待审核",
-      operation: "Delete",
-    },
-  ];
-  tableData.value = data;
+const dataSearch = async() => {
+  const searchData = { keyword: keyword.value, startDate: startDate.value, endDate: endDate.value }
+  const result =  await axiosServer.AxiosPost(qs.stringify(searchData), '/Model/ModelApplySearch')
+  tableData.value = result.map(item => {
+        item.applyDateApply = dayjs(item.applyDateApply).format("YYYY-MM-DD hh:mm:ss")
+        item.arrivalDateApply = dayjs(item.arrivalDateApply).format("YYYY-MM-DD hh:mm:ss")
+        return item;
+      });
 };
 </script>

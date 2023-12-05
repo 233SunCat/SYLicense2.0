@@ -1,0 +1,424 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TrainModule name="TrainModule">
+    
+	<Module ModuleName="SkillTrain" ShowName="技能训练">		
+	    
+		<SubModule ModuleName="CameraSkill" ShowName="镜头训练" IconName="icon_camera_train.png">
+		
+		    <TrainItem id="0"  AviFile="../res/video/虚拟操作视频_基础训练/镜头训练Ⅰ.mp4"  	
+			                   CaseFile="镜头训练Ι.htm"  						
+							   ShowName="镜头训练Ι"  	 
+							   GlobalName="CamSkillA"
+							   SkillLevel="1"
+							   TrainCode="001"
+							   />
+		
+                                    <TrainItem id="14"  AviFile="../res/video/虚拟操作视频_基础训练/CamSkillC.mp4"  	
+			                   CaseFile="镜头训练Ⅲ.htm"  						
+							   ShowName="镜头训练Ⅱ"  	 
+							   GlobalName="CamSkillC"
+							   SkillLevel="2"
+							   TrainCode="003"
+							   />
+					   
+ 		    <TrainItem id="1"  AviFile="../res/video/虚拟操作视频_基础训练/镜头训练Ⅱ.mp4"  	
+			                   CaseFile="镜头训练Ⅱ.htm" 	 		
+							   ShowName="镜头训练Ⅲ"  		 
+							   GlobalName="CamSkillB"
+							   SkillLevel="3"
+							   TrainCode="002"
+							   />    
+		
+		</SubModule>
+		
+		<SubModule ModuleName="CutSkill" ShowName="剪切训练" IconName="icon_cutting.png">
+		
+		    <TrainItem id="2"  AviFile="../res/video/虚拟操作视频_基础训练/电剪切训练.mp4"  		
+			                   CaseFile="电剪切训练Ι.htm" 				
+							   ShowName="电剪切训练Ι"  			
+							   GlobalName="Cutting"
+							    SkillLevel="1"
+								TrainCode="015"
+							   />
+							   
+		    <TrainItem id="3"  AviFile="../res/video/虚拟操作视频_基础训练/剪切训练Ⅱ.mp4" 			
+			                   CaseFile="剪切训练Ⅱ.htm" 				
+							   ShowName="剪切训练Ⅱ"  			 	
+							   GlobalName="Electro_Coagulation_Train"
+							    SkillLevel="2"
+								 TrainCode="016"
+							   />
+							   
+		</SubModule>
+		
+		<SubModule ModuleName="ElecSkill" ShowName="电凝训练" IconName="icon_electrocoagulation.png">
+		
+		    <TrainItem id="4"  AviFile="../res/video/虚拟操作视频_基础训练/精准定位训练Ⅰ.mp4"  		
+			                   CaseFile="精准定位训练Ι.htm" 				
+							   ShowName="精准定位训练Ι"  			
+							   GlobalName="PreciseNavigation"
+							    SkillLevel="1"
+								 TrainCode="009"
+							   />
+							   
+		    <TrainItem id="5"  AviFile="../res/video/虚拟操作视频_基础训练/止血训练Ⅱ.mp4"  		
+			                   CaseFile="止血训练Ⅱ.htm" 		
+							   ShowName="止血训练Ⅱ"  		 
+							   GlobalName="StopBleedTrain"
+							    SkillLevel="2"
+								 TrainCode="010"
+							   />
+		
+		
+		</SubModule>
+		
+		<SubModule ModuleName="ClipSkill" ShowName="钛夹训练" IconName="icon_titan.png">
+				   
+		    <TrainItem id="6"  AviFile="../res/video/虚拟操作视频_基础训练/钛夹训练Ⅰ.mp4"  		
+			                   CaseFile="钛夹训练Ι.htm" 
+							   ShowName="钛夹训练Ι" 
+							   GlobalName="TitaniumClipTraining"
+							    SkillLevel="1"
+								 TrainCode="017"
+							   />
+			
+			<TrainItem id="7"  AviFile="../res/video/虚拟操作视频_基础训练/钛夹训练Ⅱ.mp4"  		
+			                   CaseFile="钛夹训练Ⅱ.htm" 
+							   ShowName="钛夹训练Ⅱ" 
+							   GlobalName="SealAndCut"
+							    SkillLevel="2"
+								 TrainCode="018"
+							   />
+							   
+		<TrainItem id="8"  AviFile="../res/video/虚拟操作视频_基础训练/钛夹训练Ⅱ.mp4"  		
+			                   CaseFile="钛夹训练Ⅲ.htm" 
+							   ShowName="钛夹训练Ⅲ" 
+							   GlobalName="SealAndCut2"
+							    SkillLevel="3"
+								 TrainCode="019"
+							   />					   
+		
+		</SubModule>
+		
+		<SubModule ModuleName="SepSkill" ShowName="分离训练" IconName="icon_separation.png">
+						  
+		    <TrainItem id="9"  AviFile="../res/video/虚拟操作视频_基础训练/分离剥离训练Ⅱ.mp4"  		
+			                   CaseFile="分离剥离训练Ⅱ.htm" 	
+							   ShowName="分离剥离训练Ⅱ" 
+							   GlobalName="FineDissection"
+							    SkillLevel="2"
+								 TrainCode="008"
+							   />
+		
+		</SubModule>
+			
+		<SubModule ModuleName="GraspSkill" ShowName="抓取训练" IconName="icon_grasp.png">
+		
+		    <TrainItem id="10"  AviFile="../res/video/虚拟操作视频_基础训练/PickTrainLevel1.mp4"  	
+			                   CaseFile="抓取训练Ι.htm" 			
+							   ShowName="抓取训练Ι" 			 
+							   GlobalName="PickTrainLevel1"
+							    SkillLevel="1"
+								 TrainCode="004"
+							   />
+	
+				<TrainItem id="11"  AviFile="../res/video/虚拟操作视频_基础训练/PickTrainLevel2.mp4"  	
+			                   CaseFile="抓取训练Ⅱ.htm" 			
+							   ShowName="抓取训练Ⅱ" 			 
+							   GlobalName="PickTrainLevel2"
+							    SkillLevel="2"
+								 TrainCode="005"
+							   /> 
+						
+		</SubModule>
+		
+		<SubModule ModuleName="CoordSkill" ShowName="双手合作训练" IconName="icon_doubleHand.png">
+		
+		
+		    <TrainItem id="13"  AviFile="../res/video/虚拟操作视频_基础训练/双手合作移物训练.mp4"  	
+			                   CaseFile="双手合作移物训练Ⅲ.htm" 			
+							   ShowName="双手合作移物训练Ⅲ" 			 
+							   GlobalName="RingTransfer"
+							   SkillLevel="3"
+								TrainCode="025"
+							   />
+							 
+		
+		</SubModule>
+		
+		
+		<SubModule ModuleName="FLSSkill" ShowName="FLS技能训练" IconName="icon_fls.png">
+		
+		    <TrainItem id="15"  AviFile="../res/video/虚拟操作视频_基础训练/双手合作移物训练.mp4"  	
+			                    CaseFile="双手合作移物训练Ⅲ.htm" 			
+							    ShowName="双手合作移物训练" 			 
+							    GlobalName="RingTransfer"
+							    SkillLevel="1"
+								TrainCode="025"
+							   />
+			<TrainItem id="18"  AviFile="../res/video/虚拟操作视频_基础训练/双手合作移物训练.mp4"  	
+			                    CaseFile="双手合作移物训练Ⅲ.htm" 			
+							    ShowName="双手合作移物训练Ⅱ" 			 
+							    GlobalName="RingTransfer2"
+							    SkillLevel="1"
+								TrainCode="025"
+							   />							   
+		    <TrainItem id="16"  AviFile="../res/video/虚拟操作视频_基础训练/CutCloth.mp4" 			
+			                    CaseFile="剪圈训练Ⅱ.htm" 				
+							    ShowName="剪圈训练Ⅱ"  			 	
+							    GlobalName="CutCloth"
+							    SkillLevel="2"
+								TrainCode="021"
+							   />
+							   
+			<TrainItem id="17"  AviFile="../res/video/虚拟操作视频_基础训练/LigationTube.mp4"  	
+			                    CaseFile="套扎训练Ⅱ.htm" 			
+							    ShowName="套扎训练Ⅱ" 			 
+							    GlobalName="LigationTube"
+							    SkillLevel="2"
+								TrainCode="024"
+							   />	
+
+        						   
+		
+		</SubModule>
+		
+	</Module>
+	
+	
+	<Module ModuleName="SurgeryTrain" ShowName="手术训练">
+    
+		<SubModule ModuleName="胆囊胆道手术">
+				<TrainItem TrainName="急性胆囊炎">
+						<Case	GlobalName="GallTrain1"		SkillLevel="3" 	TrainCode="026" 	CaseName="病例1"	CaseFile="../doc/病历/胆囊切除术全套训练/病例1：急性胆囊炎.htm" />
+				</TrainItem>
+				<TrainItem TrainName="解剖异常">
+				    <Case	GlobalName="GallTrainTangle"	SkillLevel="3" 	TrainCode="026"		CaseName="缠绕性胆囊动脉"	CaseFile="../doc/病历/胆囊切除术全套训练/缠绕性胆囊动脉.htm" />
+					<Case	GlobalName="GallTrainArtery2"	SkillLevel="3" 	TrainCode="026"		CaseName="双支胆囊动脉"	CaseFile="../doc/病历/胆囊切除术全套训练/双支胆囊动脉.htm" />
+				</TrainItem>
+				
+				<TrainItem TrainName="慢性胆囊炎">
+						<Case	GlobalName="GallTrain2"		SkillLevel="3" 	TrainCode="026"		CaseName="病例1"	CaseFile="../doc/病历/胆囊切除术全套训练/病例2：慢性胆囊炎.htm" />
+				</TrainItem>
+
+                <TrainItem TrainName="胆道取石探查">
+						<Case	GlobalName="GallTrain3"		SkillLevel="3" 	TrainCode=""		CaseName="病例1"	CaseFile="../doc/病历/胆囊切除术全套训练/case2.html" />
+				</TrainItem>
+				
+				
+
+				<TrainItem TrainName="分步训练">
+					<Case	GlobalName="GallDecompose_Step1"	SkillLevel="3" 	TrainCode="054" CaseName="游离胆囊三角"	CaseFile="../doc/病历/胆囊切除术全套训练/游离胆囊三角.htm" />
+
+					<Case	GlobalName="GallDecompose_Step2"	SkillLevel="3" 	TrainCode="055" CaseName="离断胆囊动脉"	CaseFile="../doc/病历/胆囊切除术全套训练/离断胆囊动脉.htm" />
+
+					<Case	GlobalName="GallTrain_DisconnectCysticDuct"	SkillLevel="3" 	TrainCode="056" CaseName="离断胆囊管"	CaseFile="../doc/病历/胆囊切除术全套训练/离断胆囊管.htm" />
+
+					<Case	GlobalName="GallTrain_FreeGallBed"	SkillLevel="3" 	TrainCode="057" CaseName="游离胆囊床"	CaseFile="../doc/病历/胆囊切除术全套训练/游离胆囊床.htm" />
+				</TrainItem>
+
+		</SubModule>
+		
+		<SubModule ModuleName="妇科手术">
+				<TrainItem TrainName="输卵管切除术">
+						<Case	GlobalName="Salpingectomy"	SkillLevel="3" 	TrainCode="027"	 CaseName="左侧输卵管积水"	CaseFile="../doc/病历/妇科/输卵管切除病例1：左侧输卵管积水.htm" />
+                         <Case	GlobalName="SalpingectomyR"	SkillLevel="3" 	TrainCode="027"	 CaseName="右侧输卵管切除"	CaseFile="../doc/病历/妇科/输卵管切除病例2：右侧输卵管切除.htm" />
+				</TrainItem>
+						
+				<TrainItem TrainName="附件切除术">
+						<Case	GlobalName="oophorectomy"		SkillLevel="3" 	TrainCode="028"				CaseName="附件切除术"			CaseFile="../doc/病历/妇科/妇科病例：左侧附件切除.html" />
+				</TrainItem>
+					
+				<TrainItem TrainName="异位妊娠">
+						<Case	GlobalName="EctopicPregnancy"	SkillLevel="3" 	TrainCode="029"		CaseName="输卵管峡部妊娠"			CaseFile="../doc/病历/妇科/妇科病例：输卵管峡部异位妊娠.htm" />
+				        <Case	GlobalName="adhesiondecompose"	SkillLevel="3" 	TrainCode="030"		CaseName="输卵管壶腹部妊娠"	CaseFile="../doc/病历/妇科/妇科病例：输卵管壶腹部异位妊娠有黏连.htm" />
+                </TrainItem>
+				<TrainItem TrainName="卵巢囊肿">
+						<Case	GlobalName="OvarianCyst"	SkillLevel="3" 	TrainCode="087"		CaseName="卵巢囊肿"			CaseFile="../doc/病历/妇科/卵巢囊肿病例.htm" />
+                        <Case	GlobalName="Hysteromyoma"	SkillLevel="3" 	TrainCode="086"		CaseName="子宫肌瘤"			CaseFile="../doc/病历/妇科/浆膜层肌瘤病例.htm" />
+			    </TrainItem>
+			   <TrainItem TrainName="输卵管结扎">
+			              <Case	GlobalName="TubalLigation"	SkillLevel="3" 	TrainCode="087"		CaseName="输卵管结扎"			CaseFile="../doc/病历/妇科/输卵管夹绝育.htm" />
+                                                  </TrainItem>
+		</SubModule>
+		
+		<SubModule ModuleName="阑尾切除术">
+				<TrainItem TrainName="急性阑尾炎">
+						<Case	GlobalName="Appendectomy_Perrot"	SkillLevel="3" 	TrainCode="051"			CaseName="病例1"		CaseFile="../doc/病历/阑尾/病例1急性阑尾炎阑尾穿孔：阑尾切除术.html" />
+				</TrainItem>
+				<TrainItem TrainName="慢性阑尾炎">
+						<Case	GlobalName="Appendectomy_PreIlial"	SkillLevel="3" 	TrainCode="050"			CaseName="病例1"		CaseFile="../doc/病历/阑尾/慢性阑尾炎病例.htm" />
+				</TrainItem>
+		</SubModule>
+		
+		<SubModule ModuleName="乙状结肠切除术">
+				<TrainItem TrainName="乙状结肠切除术">
+						<Case	GlobalName="Sigmoidectomy1"	SkillLevel="3" 	TrainCode="052"			CaseName="病例1"		CaseFile="../doc/病历/乙状结肠/乙状结肠切除术.htm" />
+				        
+				</TrainItem>
+		</SubModule>
+		
+		<SubModule ModuleName="胸腔镜">
+				<TrainItem TrainName="左下肺叶切除">
+						<Case	GlobalName="ThoracoscopeTrain1"	SkillLevel="3" 	TrainCode="053"			CaseName="病例1"		CaseFile="../doc/病历/胸腔镜/病例1：左肺叶切除.htm" />
+				        
+				</TrainItem>
+		</SubModule>
+        <SubModule ModuleName="肾切除手术">
+				<TrainItem TrainName="左肾经腹切除">
+						<Case	GlobalName="Nephrectomy1"	  SkillLevel="3" 	TrainCode="061"			CaseName="病例1"		CaseFile="../doc/病历/肾切除/肾切除病例1.htm" />
+				        
+				</TrainItem>
+		</SubModule>
+	
+	     <SubModule ModuleName="胃旁路术">
+				<TrainItem TrainName="胃旁路术">
+					<Case	GlobalName="Gastrectomy1"	  SkillLevel="3" 	TrainCode="053"			CaseName="胃囊创建"		CaseFile="../doc/病历/胃旁路/胃囊创建训练.htm" />  
+					<Case	GlobalName="Gastrectomy2"	  SkillLevel="3" 	TrainCode="053"			CaseName="空肠吻合"		CaseFile="../doc/病历/胃旁路/空肠吻合训练.htm" />
+					<Case	GlobalName="Gastrectomy3"	  SkillLevel="3" 	TrainCode="053"			CaseName="胃肠吻合"		CaseFile="../doc/病历/胃旁路/胃肠吻合训练.htm" />
+				</TrainItem>
+				
+		</SubModule>
+	    <SubModule ModuleName="疝修补术">
+			<TrainItem TrainName="切口疝修补术">
+				<Case	GlobalName="IncisionHernia_Case1"	  SkillLevel="3" 	TrainCode="131"			CaseName="病例1"		CaseFile="../doc/病历/切口疝/脐周大切口疝.htm" />
+				        
+			</TrainItem>
+		</SubModule>
+		
+		<SubModule ModuleName="子宫切除术">
+			<TrainItem TrainName="子宫切除术">
+			    <Case	GlobalName="HyperplasiaEndometriiTraining"	SkillLevel="3" 	TrainCode="087"		CaseName="子宫切除"		CaseFile="../doc/病历/妇科/子宫切除.htm" />
+                <Case	GlobalName="Vaginalcuffclose"	SkillLevel="3" 	TrainCode="090"	CaseName="残端缝合"		CaseFile="../doc/病历/妇科/阴道残端缝合.htm" />
+			    <Case	GlobalName="MyomaSuture"	SkillLevel="3" 	TrainCode="086"		CaseName="子宫肌瘤缝合"			CaseFile="../doc/病历/妇科/浆膜层肌瘤病例.htm" />
+			</TrainItem>
+		</SubModule>
+	</Module>	
+	
+    <Module ModuleName="SutureKnotTrain" ShowName="缝合打结训练">		
+	    
+		<SubModule ModuleName="SutureSkill" ShowName="缝合训练" IconName="icon_suture.png">
+		
+		    <TrainItem id="0"  AviFile="../res/video/虚拟操作视频_基础训练/SutureCase1.mp4" 	
+			                   CaseFile="缝合训练Ι.htm"  						
+							   ShowName="缝合训练Ι"  	 
+							   GlobalName="Surgeons_SutureCase1"
+							   SkillLevel="1"
+							   TrainCode="031"
+							   />
+							   
+ 		    <TrainItem id="1"  AviFile="../res/video/虚拟操作视频_基础训练/SutureCase2.mp4"  	
+			                   CaseFile="缝合训练Ⅱ.htm" 	 		
+							   ShowName="缝合训练Ⅱ"  		 
+							   GlobalName="Surgeons_SutureCase2"
+							   SkillLevel="2"
+							   TrainCode="032"
+							   />    
+							      
+							   
+			<TrainItem id="2"  AviFile="../res/video/虚拟操作视频_基础训练/CotinueSuture.mp4"  	
+			                   CaseFile="单纯连续缝合Ⅱ.htm" 	 		
+							   ShowName="单纯连续缝合Ⅱ"  		 
+							   GlobalName="Surgeons_CotinueSuture"
+							   SkillLevel="2"
+							   TrainCode="036"
+							   /> 
+							   
+			<TrainItem id="3"  AviFile="../res/video/虚拟操作视频_基础训练/BackHand.mp4"  	
+			                   CaseFile="反手技巧训练Ⅱ.htm" 	 		
+							   ShowName="反手技巧训练Ⅱ"  		 
+							   GlobalName="Surgeons_BackHand"
+							   SkillLevel="2"
+							   TrainCode="045"
+							   /> 	  
+ 
+			<TrainItem id="4"  AviFile="../res/video/虚拟操作视频_基础训练/Outer8Knot.mp4"  	
+			                   CaseFile="外8字缝合Ⅲ.htm" 	 		
+							   ShowName="外8字缝合Ⅲ"  		 
+							   GlobalName="Surgeons_Outer8Knot"
+							   SkillLevel="3"
+							   TrainCode="044"
+							   />   
+
+						<TrainItem id="5"  AviFile="../res/video/虚拟操作视频_基础训练/Inner8Knot.mp4"  	
+			                   CaseFile="内8字缝合Ⅲ.htm" 	 		
+							   ShowName="内8字缝合Ⅲ"  		 
+							   GlobalName="Surgeons_Inner8Knot"
+							   SkillLevel="3"
+							   TrainCode="043"
+							   />   
+
+            <TrainItem id="6"  AviFile="../res/video/虚拟操作视频_基础训练/HorizontalMattressValgus.mp4"  	
+			                   CaseFile="水平褥式外翻缝合训练Ⅲ.htm" 	 		
+							   ShowName="水平褥式缝合Ⅲ"  		 
+							   GlobalName="Surgeons_HorizontalMattressValgus"
+							   SkillLevel="3"
+							   TrainCode="048"
+							   /> 
+
+            <TrainItem id="7"  AviFile="../res/video/虚拟操作视频_基础训练/VerticalMattressValgus.mp4"  	
+			                   CaseFile="垂直褥式外翻缝合训练Ⅲ.htm" 	 		
+							   ShowName="垂直褥式缝合Ⅲ"  		 
+							   GlobalName="Surgeons_VerticalMattressValgus"
+							   SkillLevel="3"
+							   TrainCode="046"
+							   /> 		
+							   
+            							   
+		    
+		</SubModule>
+		
+		<SubModule ModuleName="KnotSkill" ShowName="打结训练" IconName="icon_knot.png">
+		
+                                  <TrainItem id="8"  AviFile="../res/video/虚拟操作视频_基础训练/HalfKnot.mp4"  	
+			                   CaseFile="半结Ι.htm" 	 		
+							   ShowName="半结Ι"  		 
+							   GlobalName="Surgeons_HalfKnot"
+							   SkillLevel="1"
+							   TrainCode="037"
+							   />  
+
+                                 <TrainItem id="9"  AviFile="../res/video/虚拟操作视频_基础训练/KnotCase1.mp4"  	
+			                   CaseFile="方结训练Ⅱ.htm" 	 		
+							   ShowName="方结训练Ⅱ"  		 
+							   GlobalName="Surgeons_KnotCase1"
+							   SkillLevel="2"
+							   TrainCode="035"
+							   />  
+							   
+	                    <TrainItem id="10"  AviFile="../res/video/虚拟操作视频_基础训练/KnotCase3.mp4"  	
+			                   CaseFile="外科结Ⅱ.htm" 	 		
+							   ShowName="外科结Ⅱ"  		 
+							   GlobalName="Surgeons_KnotCase3"
+							   SkillLevel="2"
+							   TrainCode="035"
+							   />    
+
+                               <TrainItem id="11"  AviFile="../res/video/虚拟操作视频_基础训练/Ligation_Knot.mp4"  	
+			                   CaseFile="结扎结Ⅱ.htm"  						
+							   ShowName="结扎结Ⅱ"  	 
+							   GlobalName="Ligation_Knot"
+							   SkillLevel="2"
+							   TrainCode="041"
+							   />
+
+
+
+							   
+		    <TrainItem id="12"  AviFile="../res/video/虚拟操作视频_基础训练/KnotCase3.mp4"  	
+			                   CaseFile="方结训练Ⅲ.htm"  						
+							   ShowName="方结训练Ⅲ"  	 
+							   GlobalName="Surgeons_KnotCase2"
+							   SkillLevel="3"
+							   TrainCode="033"
+							   />
+							   
+							   
+							   
+		    
+							   
+			
+		
+		</SubModule>
+	</Module>
+</TrainModule>

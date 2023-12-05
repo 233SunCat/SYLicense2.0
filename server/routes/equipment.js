@@ -7,7 +7,6 @@ const Fault = require('../model/Equipment'); // 导入你定义的模型
 const dbController = require('../controller/DBController')
 const orderEquipment = require('../model/ShipEquipment')
 const path = require('path')
-const md5 = require('md5');
 
 const multer = require('multer'); // 用于处理 multipart/form-data 类型的数据  
 const upload = multer({

@@ -51,8 +51,8 @@ const ModelApply = Mongoose.Schema({
       default: ""
   },
     modelModuleAllocation: {//模块信息-分配
-        type: [String],
-        default: ['']
+        type: [{}],
+        default: null
     },
     receivingName:{//收货人姓名
         type: String,

@@ -44,7 +44,7 @@ const formInline = reactive({//这里就是获取的数据
 
 
 const onCancel = () => {
-  console.log('取消')
+  //console.log('取消')
 }
 
 //发送请求

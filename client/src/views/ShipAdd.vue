@@ -12,8 +12,8 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="中标时间">
-                <el-date-picker style="width: 100%;" v-model="formInline.orderDate" type="date" placeholder="请选择中标时间"
-                    clearable />
+                <el-date-picker style="width: 100%;" v-model="formInline.orderDate" type="datetime" placeholder="请选择中标时间"
+                :default-time="defaultTime"  clearable />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="onSubmit">确认保存</el-button>
@@ -28,7 +28,7 @@ import type { FormProps } from 'element-plus'
 import axiosServer from '../assets/common/axios-server'
 import messageBox from '../assets/common/message-box'
 const labelPosition = ref<FormProps['labelPosition']>('right')
-
+const defaultTime = new Date(2000, 1, 1, 12, 0, 0)
 const formInline = reactive({//这里就是获取的数据
     clientName: '',
     orderStatus: '',
