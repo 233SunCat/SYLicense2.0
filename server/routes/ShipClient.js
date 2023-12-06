@@ -2,8 +2,8 @@ var express = require('express');
 var router = express.Router();
 var cors = require('cors');
 const dbController = require('../controller/DBController')
-const Fault = require('../model/ShipClientMd'); // 导入你定义的模型  
-const orderEquipment = require('../model/ShipEquipment')
+const shipOrder = require('../model/ShipOrder')
+
 const orderShipEvent = require('../model/ShipEvent')
 
 
@@ -12,25 +12,16 @@ router.use(cors());
  * 增加订单，中标
  */
 router.post('/AddShip', async function (req, res, next) {
-  //dbController.CreateInsert(Fault, {modelName:'虚实结合腹腔镜',modelStyle:'BBQ'});
-  const resDate = await dbController.CreateInsert(orderEquipment, req.body);
+  const resDate = await dbController.CreateInsert(shipOrder, req.body);
   res.send(resDate)
 });
 /**
  * 订单信息
  */
 router.get('/ShipMenu', async function (req, res, next) {
-  const resDateEquipment = await dbController.GetCollections(orderEquipment);
-  res.send(resDateEquipment)
-});
-router.get('/ShipClient', async function (req, res, next) {
-  console.log('/ShipClient')
-  const resDateClient = await dbController.getDataSlideShipClient(Fault);//分别从两个数据库取出
-  res.send(resDateClient)
-})
-router.get('/ShipAll', async function (req, res, next) {
-  const resDate = await dbController.GetCollections(orderEquipment);
-  res.send(resDate)
+  const resDateEquipment = await dbController.GetCollections(shipOrder);
+  return res.json(resDateEquipment)
+
 });
 
 const turnDate = (originalData) => {
@@ -42,38 +33,9 @@ const turnDate = (originalData) => {
   });
   return transformedData
 }
-
-router.get('/GetNetwork', async function (req, res, next) {
-  const name = 'equipmentId'
-  const values = []
-  //const data =  await dbController.GetDataByfieldNameAndfieldValues(orderEquipment,query)
-  //console.log('data',data)
-});
-
-
-router.post('/GetEquipmentByIds', async function (req, res, next) {
-
-  // 确保已经连接到数据库  
-  const equipmentIdsObject = req.body
-  // 将对象的值提取为数组
-  const equipmentIdsArray = Object.values(equipmentIdsObject);
-  // 去除数组中的空格
-  const cleanedEquipmentIdsArray = equipmentIdsArray.map(id => id.trim());
-  dbController.GetDataByfieldNameAndfieldValues(orderEquipment, 'equipmentId', cleanedEquipmentIdsArray)
-    .then((results) => {
-      if (results && results.length > 0) {
-        res.send(results)
-      } else {
-      }
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-    });
-});
 router.post('/GetShipEmailiByOrderDateAndClientName', async function (req, res, next) {
-  //req.body { clientName: '苏州医院', orderDate: '2020-10-16T00:00:00.000Z' }
   const query = req.body
-  const result = await dbController.GetCollectionsByCollections(orderEquipment, query)
+  const result = await dbController.GetCollectionsByCollections(shipOrder, query)
   result = result.filter(item => item.equipmentId != '')
   result = result.map(item => ({
     emailName: item.emailName, emailPhone: item.emailPhone, emailCity: item.emailCity,
@@ -82,52 +44,45 @@ router.post('/GetShipEmailiByOrderDateAndClientName', async function (req, res, 
   }))
 })
 /**
- * 发货用户信息查询
+ * 用户信息-查询
  */
 router.post('/GetShipUserStatus', async function (req, res, next) {
-  //req.body { clientName: '苏州医院', orderDate: '2020-10-16T00:00:00.000Z' }
   const query = req.body
-  var result = await dbController.GetCollectionsByCollections(orderEquipment, query)
-  result = result.filter(item => item.equipmentId == '')
-  result = result.map(item => ({
-    clientName: item.clientName,
-    orderStatus: item.orderStatus,
-    clientArea: item.clientArea,
-    clientProvince: item.clientProvince,
-    clientUrban: item.clientUrban,
-    clientLevel: item.clientLevel,
-  }))
-  res.send(result)
+  const searchKey = ['clientName', 'orderStatus', 'clientArea', 'clientProvince', 'clientUrban', 'clientLevel']
+  var result = await dbController.GetCollectionsOneByCollections(shipOrder, query, searchKey)
+  result = result.message
+  return res.json(result);
+
 })
 /**
- * 发货用户信息增加
+ * 用户信息-增加
  */
 router.post('/AddShipUserStatus', async function (req, res, next) {
   const query = { clientName: req.body.clientName, orderDate: req.body.orderDate };
   delete req.body.clientName
   delete req.body.orderDate
   const update = req.body
-  try {
-    const result = await dbController.UpdateCollectionsByCollections(orderEquipment, query, update);
-    console.log('AddShipUserStatus result:', result);
-    // 根据需要处理 result
-    return res.json(result);
-  } catch (error) {
-    console.error('AddShipUserStatus error:', error);
-    return res.status(500).json({ success: false, error: 'Internal Server Error' });
-  }
+  const result = await dbController.UpdateCollectionsByCollections(shipOrder, query, update);
+  // 根据需要处理 result
+  return res.json(result)
 });
 /**
 /**
  * 设备名称查询
  */
 router.post('/GetShipEquipmentNames', async function (req, res, next) {
-  //req.body { clientName: '苏州医院', orderDate: '2020-10-16T00:00:00.000Z' }
   const query = req.body
-  var result = await dbController.GetCollectionsByCollections(orderEquipment, query)
-  result = result.filter(item => item.equipmentId != '')
-  console.log('result', result)
-  res.send(result)
+  try {
+    var result = await dbController.GetCollectionsByCollections(shipOrder, query)
+    if (result.length == 0) {
+      return res.status(500).json({ success: false, error: '数据库没有该订单的文档' });
+    }
+    result = result.map(item => item.equipment)
+    return res.json(result[0]);
+  } catch (error) {
+    console.error('GetShipEquipmentNames error:', error);
+    return res.status(500).json({ success: false, error: '网络错误' });
+  }
 })
 /**
  * 设备添加
@@ -136,43 +91,26 @@ router.post('/AddShipEquipment', async function (req, res, next) {
   const data = req.body;
   const query = { clientName: req.body.clientName, orderDate: req.body.orderDate };
   const arryData = turnDate(data);
-  const insertPromises = arryData.map(async (data) => {
-  const existingEquipment = await orderEquipment.findOne({ equipmentId: data.equipmentId });
-    if (existingEquipment) {
-      // 如果已存在，执行更新操作
-      try{
-        const updateResult = await dbController.UpdateCollectionsByCollections(orderEquipment, { equipmentId: data.equipmentId }, data);
-        return res.json(updateResult);
-
-      }catch(error){
-        console.error(' error:', error);
-        return res.status(500).json({ success: false, error: 'Internal Server Error' });
-      }
-    } else {
-      // 如果不存在，执行插入操作
-      try{
-        const insertResult = await dbController.CreateInsert(orderEquipment, data);
-        return res.json(insertResult);
-      }catch(error){
-        console.error(' error:', error);
-        return res.status(500).json({ success: false, error: 'Internal Server Error' });
-      }
+  try {
+    const shipClient = await shipOrder.findOne(query);
+    console.log('shipClient', shipClient)
+    if (!shipClient) {
+      // 如果找不到对应文档，可以根据需要进行处理
+      return res.send({ success: false, message: '找不到对应的 ShipClient 文档' })
     }
-  });
-  // try {
-  //   const insertPromises = arryData.map(data => dbController.CreateInsert(orderEquipment, data));
-  //   const results = await Promise.all(insertPromises);
-  //   // 检查结果并发送响应
-  //   const success = results.every(result => result.success);
-  //   if (success) {
-  //     res.status(200).json({ success: true, message: '所有数据成功插入' });
-  //   } else {
-  //     res.status(500).json({ success: false, message: '部分数据插入失败' });
-  //   }
-  // } catch (error) {
-  //   console.error(error);
-  //   res.status(500).json({ success: false, message: '内部服务器错误' });
-  // }
+
+    const updateResult = await shipOrder.updateMany(
+      query,
+      { $push: { 'equipment': arryData } }
+    );
+    // 保存更新后的 ShipClient 文档
+    await shipClient.save();
+
+    return res.send({ success: true, message: '数据更新成功' })
+  } catch (error) {
+    console.error('error:', error);
+    return res.send({ success: false, message: '数据更新失败' })
+  }
 });
 /**
  * 联网-增加
@@ -181,53 +119,42 @@ router.post('/AddShipNetwork', async function (req, res, next) {
   const query = {
     clientName: req.body.clientName,
     orderDate: req.body.orderDate,
-    equipmentId: { $in: req.body.equipmentIds }
+    'equipment.equipmentId': { $in: req.body.equipmentIds }
   };
-  delete req.body.clientName
-  delete req.body.orderDate
-  delete req.body.equipmentIds
-  const update = req.body
   try {
-    const result = await dbController.UpdateCollectionsByCollections(orderEquipment, query, update);
-    // 根据需要处理 result
-    return res.json(result);
+    // 使用 $set 操作符更新匹配的子文档中的 equipmentNetwork 值
+    const updateResult = await shipOrder.updateMany(
+      query,
+      { $set: { 'equipment.$[elem].equipmentNetwork': '是', 'equipment.$[elem].protectTime': req.body.protectTime } },
+      { arrayFilters: [{ 'elem.equipmentId': { $in: req.body.equipmentIds } }] }
+    );
+    console.log('updateResult', updateResult)
+    return res.json({ success: true, message: '数据更新成功' })
   } catch (error) {
     console.error('AddShipReceiving error:', error);
     return res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 });
+
 /**
  * 联网查询
  */
 router.post('/GetShipNetwork', async function (req, res, next) {
-  //req.body { clientName: '苏州医院', orderDate: '2020-10-16T00:00:00.000Z' }
   const query = req.body
-  var result = await dbController.GetCollectionsByCollections(orderEquipment, query)
-  result = result.filter(item => item.equipmentId != '')
-  result = result.map(item => ({
-    equipmentNetwork: item.equipmentNetwork,
-    equipmentId: item.equipmentId,
-    protectTime: item.protectTime,
-  }))
-  res.send(result)
+  const searchKey = ['equipment']
+  var result = await dbController.GetCollectionsOneByCollections(shipOrder, query, searchKey)
+  result = result.message.equipment
+  return res.json(result);
 })
 /**
  * 收货单查询
  */
 router.post('/GetShipReceiving', async function (req, res, next) {
-  //req.body { clientName: '苏州医院', orderDate: '2020-10-16T00:00:00.000Z' }
   const query = req.body
-  var result = await dbController.GetCollectionsByCollections(orderEquipment, query)
-  result = result.filter(item => item.equipmentId != '')
-  result = result.map(item => ({
-    receivingName: item.receivingName,
-    receivingPhone: item.receivingPhone,
-    receivingCity: item.receivingCity,
-    receivingCompany: item.receivingCompany,
-    receivingCity_q: item.receivingCity_q,
-    receivingDate: item.receivingDate
-  }))
-  res.send(result)
+  const searchKey = ['receivingName', 'receivingPhone', 'receivingCity', 'receivingCompany', 'receivingCity_q', 'receivingDate']
+  var result = await dbController.GetCollectionsOneByCollections(shipOrder, query, searchKey)
+  result = result.message
+  return res.json(result)
 })
 /**
  * 收货单增加
@@ -237,35 +164,19 @@ router.post('/AddShipReceiving', async function (req, res, next) {
   delete req.body.clientName
   delete req.body.orderDate
   const update = req.body
-  try {
-    const result = await dbController.UpdateCollectionsByCollections(orderEquipment, query, update);
-    console.log('AddShipReceiving result:', result);
-    // 根据需要处理 result
-    return res.json(result);
-  } catch (error) {
-    console.error('AddShipReceiving error:', error);
-    return res.status(500).json({ success: false, error: 'Internal Server Error' });
-  }
+  const result = await dbController.UpdateCollectionsByCollections(shipOrder, query, update);
+  // 根据需要处理 result
+  return res.json(result);
 });
 /**
  * 发货单查询
  */
 router.post('/GetShipEmail', async function (req, res, next) {
-  //req.body { clientName: '苏州医院', orderDate: '2020-10-16T00:00:00.000Z' }
   const query = req.body
-  var result = await dbController.GetCollectionsByCollections(orderEquipment, query)
-  result = result.filter(item => item.equipmentId != '')
-  result = result.map(item => ({
-    emailName: item.emailName,
-    emailPhone: item.emailPhone,
-    emailCity: item.emailCity,
-    emailCompany: item.emailCompany,
-    emailCity_q: item.emailCity_q,
-    emailDate: item.emailDate,
-    shippingCost: item.shippingCost,
-    paymentMethod: item.paymentMethod
-  }))
-  res.send(result)
+  const searchKey = ['emailName', 'emailPhone', 'emailCity', 'emailCompany', 'emailCity_q', 'emailDate', 'shippingCost', 'paymentMethod']
+  var result = await dbController.GetCollectionsOneByCollections(shipOrder, query, searchKey)
+  result = result.message
+  return res.json(result)
 })
 /**
  * 发货单增加
@@ -275,32 +186,19 @@ router.post('/AddShipEmail', async function (req, res, next) {
   delete req.body.clientName
   delete req.body.orderDate
   const update = req.body
-  try {
-    const result = await dbController.UpdateCollectionsByCollections(orderEquipment, query, update);
-    console.log('AddShipReceiving result:', result);
-    // 根据需要处理 result
-    return res.json(result);
-  } catch (error) {
-    console.error('AddShipReceiving error:', error);
-    return res.status(500).json({ success: false, error: 'Internal Server Error' });
-  }
+  const result = await dbController.UpdateCollectionsByCollections(shipOrder, query, update);
+  // 根据需要处理 result
+  return res.json(result);
 });
 /**
  * 签收单查询
  */
 router.post('/GetSignfor', async function (req, res, next) {
-  //req.body { clientName: '苏州医院', orderDate: '2020-10-16T00:00:00.000Z' }
   const query = req.body
-  var result = await dbController.GetCollectionsByCollections(orderEquipment, query)
-  //resut [{},{}]
-  result = result.filter(item => item.equipmentId != '')
-  result = result.map(item => ({
-    signforName: item.signforName,
-    signforPhone: item.signforPhone,
-    signforDate: item.signforDate,
-    inventoryStatus: item.inventoryStatus
-  }))
-  res.send(result)
+  const searchKey = ['signforName', 'signforPhone', 'signforDate', 'inventoryStatus']
+  var result = await dbController.GetCollectionsOneByCollections(shipOrder, query, searchKey)
+  result = result.message
+  return res.json(result)
 })
 /**
  * 签收单增加
@@ -310,31 +208,19 @@ router.post('/AddSignfor', async function (req, res, next) {
   delete req.body.clientName
   delete req.body.orderDate
   const update = req.body
-  try {
-    const result = await dbController.UpdateCollectionsByCollections(orderEquipment, query, update);
-    console.log('AddShipReceiving result:', result);
-    // 根据需要处理 result
-    return res.json(result);
-  } catch (error) {
-    console.error('AddShipReceiving error:', error);
-    return res.status(500).json({ success: false, error: 'Internal Server Error' });
-  }
+  const result = await dbController.UpdateCollectionsByCollections(shipOrder, query, update);
+  // 根据需要处理 result
+  return res.json(result);
 });
 /**
  * 验收单查询
  */
 router.post('/GetShipAccept', async function (req, res, next) {
-  //req.body { clientName: '苏州医院', orderDate: '2020-10-16T00:00:00.000Z' }
   const query = req.body
-  var result = await dbController.GetCollectionsByCollections(orderEquipment, query)
-  //resut [{},{}]
-  result = result.filter(item => item.equipmentId != '')
-  result = result.map(item => ({
-    acceptName: item.acceptName,
-    acceptPhone: item.acceptPhone,
-    acceptDate: item.acceptDate,
-  }))
-  res.send(result)
+  const searchKey = ['acceptName', 'acceptPhone', 'acceptDate']
+  var result = await dbController.GetCollectionsOneByCollections(shipOrder, query, searchKey)
+  result = result.message
+  return res.json(result)
 })
 /**
  * 验收单增加
@@ -344,37 +230,22 @@ router.post('/AddShipAccept', async function (req, res, next) {
   delete req.body.clientName
   delete req.body.orderDate
   const update = req.body
-  try {
-    const result = await dbController.UpdateCollectionsByCollections(orderEquipment, query, update);
-    // 根据需要处理 result
-    return res.json(result);
-  } catch (error) {
-    console.error('AddShipReceiving error:', error);
-    return res.status(500).json({ success: false, error: 'Internal Server Error' });
-  }
+  const result = await dbController.UpdateCollectionsByCollections(shipOrder, query, update);
+  // 根据需要处理 result
+  return res.json(result);
 });
 /**
  * 合同查询
  */
 router.post('/GetShipContracts', async function (req, res, next) {
-  //req.body { clientName: '苏州医院', orderDate: '2020-10-16T00:00:00.000Z' }
   const query = req.body
-  var result = await dbController.GetCollectionsByCollections(orderEquipment, query)
-  //resut [{},{}]
-  result = result.filter(item => item.equipmentId != '')
-  result = result.map(item => ({
-    dealer: item.dealer,
-    contractSignDate: item.contractSignDate,
-    contractMoney: item.contractMoney,
-    paymentDate: item.paymentDate,
-    winningBidPrice: item.winningBidPrice,
-    serviceFee: item.serviceFee,
-    invoiceStatus: item.invoiceStatus,
-    invoiceDate: item.invoiceDate,
-    invoiceNumber: item.invoiceNumber,
-    paymentMethod: item.paymentMethod,
-  }))
-  res.send(result)
+  const searchKey = ['dealer', 'contractSignDate', 'contractMoney',
+    'paymentDate', 'winningBidPrice', 'serviceFee',
+    'invoiceStatus', 'invoiceDate', 'invoiceNumber',
+    'paymentMethod']
+  var result = await dbController.GetCollectionsOneByCollections(shipOrder, query, searchKey)
+  result = result.message
+  return res.json(result)
 })
 /**
  * 合同增加
@@ -384,15 +255,9 @@ router.post('/AddShipContracts', async function (req, res, next) {
   delete req.body.clientName
   delete req.body.orderDate
   const update = req.body
-  try {
-    const result = await dbController.UpdateCollectionsByCollections(orderEquipment, query, update);
-    console.log('AddShipReceiving result:', result);
-    // 根据需要处理 result
-    return res.json(result);
-  } catch (error) {
-    console.error('AddShipReceiving error:', error);
-    return res.status(500).json({ success: false, error: 'Internal Server Error' });
-  }
+  const result = await dbController.UpdateCollectionsByCollections(shipOrder, query, update);
+  // 根据需要处理 result
+  return res.json(result);
 });
 /**
  * 订单事件查询
@@ -408,7 +273,6 @@ router.post('/GetShipEvent', async function (req, res, next) {
     clientName: req.body.clientName,
     orderDate: req.body.orderDate
   };
-  console.log('query', query)
   var result = await dbController.GetCollectionsByCollections(orderShipEvent, query)
   res.send(result)
 })
@@ -438,10 +302,10 @@ router.post('/GetShipSearch', async function (req, res, next) {
   const targetKeyword = {
     "用户名称": "clientName",
     "订单状态": "orderStatus",
-    "订单设备名称": "equipmentName",
-    "订单设备编号": "equipmentId",
-    "订单设备型号": "equipmentStyle",
-    "订单设备模块": "equipmentModule",
+    "设备名称": "equipmentName",
+    "设备编号": "equipmentId",
+    "设备型号": "equipmentStyle",
+    "设备模块": "equipmentModule",
     "是否联网": "equipmentNetwork",
     "质保期": "protectTime",
     "收货人姓名": "receivingName",
@@ -485,8 +349,82 @@ router.post('/GetShipSearch', async function (req, res, next) {
   const startDate = req.body.startDate
   const endDate = req.body.endDate
   const keyword = req.body.keyword
-  var result = await dbController.GetCollectionsByKeywordAndDate(orderEquipment, keyword, keywordArray
-    , startDate, endDate, DateArray)
-  res.send(result)
+  var document = []
+  // var client = await dbController.GetCollectionsByKeywordAndDate(shipOrder, keyword, keywordArray
+  //   , startDate, endDate, DateArray)
+  var client = await dbController.GetCollections(shipOrder)
+  // 创建一个新的数组，每个元素都是提升equipment子文档字段后的文档对象
+  client.forEach(item => {
+    item.equipment.forEach(itemSub => {
+      var dic = {}
+      dic.equipmentName = itemSub._doc.equipmentName
+      dic.equipmentStyle = itemSub._doc.equipmentStyle
+      dic.equipmentId = itemSub._doc.equipmentId
+      dic.protectTime = itemSub._doc.protectTime
+      dic.equipmentNetwork = itemSub._doc.equipmentNetwork
+      dic.equipmentModule = itemSub._doc.equipmentModule
+      //client
+      dic.clientName = item.clientName
+      dic.clientArea = item.clientArea
+      dic.clientProvince = item.clientProvince
+      dic.clientUrban = item.clientUrban
+      dic.clientLevel = item.clientLevel
+      dic.orderStatus = item.orderStatus
+
+      dic.orderDate = item.orderDate
+      dic.protectTime = item.protectTime
+      dic.receivingName = item.receivingName
+      dic.receivingPhone = item.receivingPhone
+      dic.receivingCity = item.receivingCity
+      dic.receivingCompany = item.receivingCompany
+      dic.receivingCity_q = item.receivingCity_q
+      dic.receivingDate = item.receivingDate
+      dic.emailName = item.emailName
+      dic.emailPhone = item.emailPhone
+      dic.emailCity = item.emailCity
+      dic.emailCompany = item.emailCompany
+
+      dic.emailCity_q = item.emailCity_q
+      dic.emailDate = item.emailDate
+      dic.shippingCost = item.shippingCost
+      dic.paymentMethod = item.paymentMethod
+      dic.signforName = item.signforName
+      dic.signforPhone = item.signforPhone
+      dic.signforDate = item.signforDate
+      dic.inventoryStatus = item.inventoryStatus
+      dic.acceptName = item.acceptName
+      dic.acceptPhone = item.acceptPhone
+      dic.acceptDate = item.acceptDate
+
+      dic.dealer = item.dealer
+      dic.contractSignDate = item.contractSignDate
+      dic.contractMoney = item.contractMoney
+      dic.paymentDate = item.paymentDate
+      dic.winningBidPrice = item.winningBidPrice
+      dic.serviceFee = item.serviceFee
+      dic.invoiceStatus = item.invoiceStatus
+
+      dic.invoiceDate = item.invoiceDate
+      dic.invoiceNumber = item.invoiceNumber
+      document.push(dic)
+    })
+  })
+
+  var dynamicConditions;
+
+  // 构建动态查询条件
+  if (DateArray.length == 0) {
+    // 如果没有日期字段，只使用关键字字段构建查询条件
+    dynamicConditions = document.filter(item =>
+      keywordArray.some(field => item[field] && item[field].toString().toLowerCase().includes(keyword.toLowerCase()))
+    );
+  } else {
+    // 如果有日期字段，使用关键字字段和日期字段构建查询条件
+    dynamicConditions = document.filter(item =>
+      DateArray.some(field => item[field] && new Date(item[field]) >= startDate && new Date(item[field]) <= endDate) &&
+      keywordArray.some(field => item[field] && item[field].toString().toLowerCase().includes(keyword.toLowerCase()))
+    );
+  }
+  res.send(dynamicConditions)
 })
 module.exports = router;

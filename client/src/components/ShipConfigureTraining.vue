@@ -318,19 +318,17 @@ const EquipmentAdd = () => {//触发事件-增加设备
 /**
  * 保存设备信息
  */
-const EquipmentSubmit = () => {//保存失败弹框
-  console.log('formInline', formInline)
+const EquipmentSubmit = async() => {//保存失败弹框
   const { equipmentNames, ...newfornInline } = formInline;
   //发送请求.
-  axiosServer.AxiosPost(qs.stringify(newfornInline), '/ShipClient/AddShipEquipment').then(res => {
-    if (res.success == true) {
+  const res = await axiosServer.AxiosPost(qs.stringify(newfornInline), '/ShipClient/AddShipEquipment')
+  if (res.success == true) {
       messageBox.MessageBox('保存成功')
     } else {
       messageBox.MessageBox('保存失败')
     }
-  })
-}
-/**
+  }
+  /**
  * 查看单类型设备信息
  * @param item 
  */
@@ -366,6 +364,7 @@ const handerBus = async (val: any) => {
   //EventBus.off('slide-ship-order', handerBus)
   console.log('formInline',formInline)
   axiosServer.AxiosPost(val, '/ShipClient/GetShipEquipmentNames').then(res => {//res = [],如果id存在[{}...]，id不存在[]
+    console.log('设备信息',res)
     const data = formMap(res)
     const formData = processEquipmentData(data)
     processEquipmentButton(formData)

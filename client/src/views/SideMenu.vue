@@ -17,7 +17,6 @@
             <el-icon><Menu /></el-icon>           
              <span>产品模块</span>
           </template>
-          <!-- <router-link to="/ForceFeedback"><el-menu-item index="1-1">力反馈腹腔镜</el-menu-item></router-link> -->
           <router-link style="  text-decoration: none;" to="/ProductModule"><el-menu-item index="1-2">产品模块管理</el-menu-item></router-link>
         </el-sub-menu>
         <el-sub-menu index="2" height="100%">

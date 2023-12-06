@@ -71,11 +71,12 @@ const formInlineCopy = formInline
 var  orderDate  = null
 var clientName = ''
 const onSubmit = () => {
+  formInline.inventoryStatus = inventoryStatus.value
   const formInlineFields = Object.keys(formInline);  
+  console.log('formInline签收',formInline)
   if(funBox.checkRequiredFields(formInline, formInlineFields)){return}
   formInline.orderDate = orderDate
   formInline.clientName = clientName
-  formInline.inventoryStatus = inventoryStatus.value
   axiosServer.AxiosPost(qs.stringify(formInline), '/ShipClient/AddSignfor').then(res => {
     if (res.success == true) {
       messageBox.MessageBox('保存成功')
@@ -89,10 +90,8 @@ const handerBus = async (val: any) => {
     clientName = val.clientName
     //EventBus.off('slide-ship-order', handerBus)
     axiosServer.AxiosPost(val,'/ShipClient/GetSignfor').then(res=>{
-      if(res.length != 0){
-        inventoryStatus.value = res[0].inventoryStatus
-      }
-      Object.assign(formInline, funBox.FormDisplay(res,formInline,formInlineCopy));
+        inventoryStatus.value = res.inventoryStatus
+      Object.assign(formInline, funBox.FormDisplayOne(res,formInline,formInlineCopy));
     })
 }
 EventBus.on('slide-ship-order', handerBus)

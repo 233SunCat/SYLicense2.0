@@ -101,7 +101,7 @@ const handerBus = async (val: any) => {
     uploadData = {orderDate:orderDate ,clientName:clientName}
     await handleLoad()
     axiosServer.AxiosPost(val,'/ShipClient/GetShipAccept').then(res=>{
-      Object.assign(formInline, funBox.FormDisplay(res,formInline,formInlineCopy));
+      Object.assign(formInline, funBox.FormDisplayOne(res,formInline,formInlineCopy));
     })
 }
 EventBus.on('slide-ship-order', handerBus)
@@ -118,7 +118,7 @@ EventBus.on('slide-ship-order', handerBus)
     // 显示上传失败的提示
     ElMessage.error('文件 上传失败，请重试或联系管理员!');
   }
-  await handleLoad()
+  //await handleLoad()
 };
 /**
  * 

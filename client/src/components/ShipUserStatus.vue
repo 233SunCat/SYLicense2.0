@@ -2,7 +2,7 @@
     <div class="common-layout" style="height: 50%">
         <el-container style="height: 100%">
             <el-header style="background-color: #f6f8f8; display: flex; align-items: center">
-                <el-text class="mx-1" size="large">收货信息</el-text>
+                <el-text class="mx-1" size="large">用户信息</el-text>
             </el-header>
             <el-main style="background-color: #ffffff">
                 <div style="
@@ -122,10 +122,9 @@ const onSubmit = () => {
  const handerBus = async (val: any) => {
     orderDate = val.orderDate
     clientName = val.clientName
-    EventBus.off('slide-ship-order', handerBus)
 
     axiosServer.AxiosPost(val, '/ShipClient/GetShipUserStatus').then(res => {//res = [],如果id存在[{}...]，id不存在[]
-        Object.assign(formInline, funBox.FormDisplay(res,formInline,formInlineCopy));
+        Object.assign(formInline, funBox.FormDisplayOne(res,formInline,formInlineCopy));
     })
 }
 EventBus.on('slide-ship-order', handerBus)

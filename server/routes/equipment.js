@@ -2,11 +2,10 @@
 var express = require('express');
 var router = express.Router();
 var cors = require('cors');
-const InsertEquipment = require('../controller/EquipmentController')
 const Fault = require('../model/Equipment'); // 导入你定义的模型  
 const dbController = require('../controller/DBController')
-const orderEquipment = require('../model/ShipEquipment')
 const path = require('path')
+const shipOrder = require('../model/ShipOrder')
 
 const multer = require('multer'); // 用于处理 multipart/form-data 类型的数据  
 const upload = multer({
@@ -50,6 +49,7 @@ router.post('/EquipmentSubmit', upload.array('files', 5), async (req, res) => {
     const filePaths = files.map(file => file.path);
     const imageVideo = filePaths;
     // 使用updateOne方法，根据equipmentId进行更新或插入
+    console.log('44444',req.body)
     const result = await Fault.updateOne(
       { equipmentId: equipmentId },
       {
@@ -225,11 +225,30 @@ router.post('/EquipmentDetail/RepairSubmit', async (req, res) => {
 
 
 router.post('/CheckAndRetrieveprotectTime',async(req, res) => {
-  const result = await dbController.getProtectTimeByEquipmentId(orderEquipment,req.body.equipmentId);
-  if (result != null) {
-    return res.send({success:true,result:result})
-  } else {
-    return res.send({success:false,result:null})
-  }  
+  // const result = await dbController.getProtectTimeByEquipmentId(shipOrder,req.body.equipmentId);
+  // if (result != null) {
+  //   return res.send({success:true,result:result})
+  // } else {
+  //   return res.send({success:false,result:null})
+  // }  
+  try {
+    // 使用 findOne 方法查找匹配的文档
+    const foundDocument = await shipOrder.findOne({ 'equipment.equipmentId': req.body.equipmentId });
+
+    // 如果找到了文档，返回 protectTime 的值
+    if (foundDocument) {
+      const equipmentInfo = foundDocument.equipment.find(equipment => equipment.equipmentId === req.body.equipmentId);
+      const protectTime = equipmentInfo?.protectTime || 'ProtectTime Not Found';
+      const signforDate = foundDocument.signforDate || 'SignforDate Not Found';
+
+      var result =  { protectTime: protectTime, signforDate:signforDate };
+      res.send({success:true,result:result})
+    }else {
+      return 'Document Not Found'; // 如果找不到文档，返回一个默认值或错误消息
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return 'Error Occurred'; // 如果发生错误，返回一个默认值或错误消息
+  }
 })
 module.exports = router;

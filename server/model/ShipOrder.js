@@ -32,165 +32,172 @@ const ShipClient = Mongoose.Schema({
     type: Date,
     default: null
   },
-  equipmentName: {//订单设备名称
+  protectTime: {//质保期
     type: String,
     default: ""
   },
-  equipmentId: {//订单设备编号
+  equipment: [{//设备集合
+
+    equipmentName: {//订单设备名称
+      type: String,
+      default: ""
+    },
+    equipmentStyle: {//订单设备型号
+      type: String,
+      default: ""
+    },
+    equipmentId: {//订单设备编号
+      type: String,
+      default: ""
+    },
+    protectTime: {//质保期
+      type: String,
+      default: ""
+    },
+    equipmentNetwork: {//是否联网
+      type: String,
+      default: ""
+    },
+    equipmentModule: {//订单设备模块
+      type: [String],
+      default: null
+    },
+  }],
+  receivingName: {//收货人姓名
     type: String,
     default: ""
   },
-  equipmentStyle:{//订单设备型号
+  receivingPhone: {//收货人手机号
     type: String,
     default: ""
   },
-  equipmentModule:{//订单设备模块
-    type: [String],
-    default: null
-  },
-  equipmentNetwork:{//是否联网
+  receivingCity: {//收货地址
     type: String,
     default: ""
   },
-  protectTime:{//质保期
+  receivingCompany: {//收货机构
     type: String,
     default: ""
   },
-  receivingName:{//收货人姓名
+  receivingCity_q: {//详细收货地址
     type: String,
     default: ""
   },
-  receivingPhone:{//收货人手机号
-    type: String,
-    default: ""
-  },
-  receivingCity:{//收货地址
-    type: String,
-    default: ""
-  },
-  receivingCompany:{//收货机构
-    type: String,
-    default: ""
-  },
-  receivingCity_q:{//详细收货地址
-    type: String,
-    default: ""
-  },
-  receivingDate:{//期望到货时间
+  receivingDate: {//期望到货时间
     type: Date,
     default: null
   },
-  emailName:{//发货人姓名
+  emailName: {//发货人姓名
     type: String,
     default: ""
   },
-  emailPhone:{//发货人手机号
+  emailPhone: {//发货人手机号
     type: String,
     default: ""
   },
-  emailCity:{//发货城市
+  emailCity: {//发货城市
     type: String,
     default: ""
   },
-  emailCompany:{//发货机构
+  emailCompany: {//发货机构
     type: String,
     default: ""
   },
-  emailCity_q:{//详细发货地址
+  emailCity_q: {//详细发货地址
     type: String,
     default: ""
   },
-  emailDate:{//发货时间
+  emailDate: {//发货时间
     type: Date,
     default: null
   },
-  shippingCost:{//物流费用
+  shippingCost: {//物流费用
     type: String,
     default: ""
   },
-  paymentMethod:{//支付方式
+  paymentMethod: {//支付方式
     type: String,
     default: ""
   },
-  signforName:{//签收人姓名
+  signforName: {//签收人姓名
     type: String,
     default: ""
   },
-  signforPhone:{//签收人手机号
+  signforPhone: {//签收人手机号
     type: String,
     default: ""
   },
-  signforDate:{//签收日期
+  signforDate: {//签收日期
     type: Date,
     default: null
   },
-  inventoryStatus:{//是否在库
+  inventoryStatus: {//是否在库
     type: String,
     default: ''
-  },  
-  acceptName:{//验收方姓名
+  },
+  acceptName: {//验收方姓名
     type: String,
     default: ""
   },
-  acceptPhone:{//验收方手机号
+  acceptPhone: {//验收方手机号
     type: String,
     default: ""
   },
-  acceptDate:{//验收日期
+  acceptDate: {//验收日期
     type: Date,
     default: null
   },
-  inspectionFiles:{//验收单文件
+  inspectionFiles: {//验收单文件
     type: [String],
     default: []
   },
-  dealer:{//代理商信息
+  dealer: {//代理商信息
     type: String,
     default: ""
   },
-  contractSignDate:{//合同签订日期
+  contractSignDate: {//合同签订日期
     type: Date,
     default: null
   },
-  contractMoney:{//合同签订金额
+  contractMoney: {//合同签订金额
     type: String,
     default: ""
   },
-  contractFiles:{//合同文件
+  contractFiles: {//合同文件
     type: [String],
     default: []
   },
-  paymentDate:{//付款日期
+  paymentDate: {//付款日期
     type: Date,
     default: null
   },
-  paymentMethod:{//付款方式
+  paymentMethod: {//付款方式
     type: String,
     default: ""
   },
-  winningBidPrice:{//中标价格
+  winningBidPrice: {//中标价格
     type: String,
     default: ""
   },
-  serviceFee:{//服务费
+  serviceFee: {//服务费
     type: String,
     default: ""
   },
-  invoiceStatus:{//开票情况
+  invoiceStatus: {//开票情况
     type: String,
     default: ""
   },
-  invoiceDate:{//开票日期
+  invoiceDate: {//开票日期
     type: Date,
     default: null
   },
-  invoiceNumber:{//开票编号
+  invoiceNumber: {//开票编号
     type: String,
     default: ""
   }
 }
 );
-const Fault = Mongoose.model('shipequipment', ShipClient,'shipequipment');
+const Fault = Mongoose.model('shiporder', ShipClient, 'shiporder');
 
 // console.log(Fault)
 // module.exports = Fault;

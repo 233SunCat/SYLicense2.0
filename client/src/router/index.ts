@@ -17,7 +17,6 @@ import ProductModule from '../views/ProductModule.vue'
 import ShipSearch from '../views/ShipSearch.vue'
 import MTShip from '../views/MTShip.vue'
 import MTShips from '../views/MTShips.vue'
-import EquipmentVideo from '../views/EquipmentVideo.vue'
 
 
 const routes: Array<RouteRecordRaw> = [
@@ -96,11 +95,6 @@ const routes: Array<RouteRecordRaw> = [
         path: '/MTapply/MTShips',
         name: 'MTShips',
         component: MTShips
-      },
-      {
-        path: '/ShipVideo',
-        name: 'ShipVideo',
-        component: EquipmentVideo
       },
     ],
   },

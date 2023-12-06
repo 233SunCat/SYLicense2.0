@@ -5,7 +5,7 @@ var path = require('path');
 const multer = require('multer'); // 用于处理 multipart/form-data 类型的数据  
 const fs = require("fs")
 const archiver = require('archiver')
-const orderEquipment = require('../model/ShipEquipment')
+const shipOrder = require('../model/ShipOrder')
 const dbController = require('../controller/DBController')
 
 const upload = multer({
@@ -42,7 +42,7 @@ router.post('/inspectionUpload', upload.single('file'), async(req, res) => {
   console.log('验收单上传',query,req.file.originalname)
   const update = {$push: { inspectionFiles: req.file.originalname }}
   try {
-    const result = await dbController.UpdateCollectionsByCollections(orderEquipment, query, update);
+    const result = await dbController.UpdateCollectionsByCollections(shipOrder, query, update);
     // 根据需要处理 result
     return res.json(result);
   } catch (error) {
@@ -61,7 +61,7 @@ router.post('/inspectionRemove', upload.single('file'), async(req, res) => {
   delete req.body.orderDate
   const update = {$pull: { inspectionFiles: req.body.fileName }}
   try {
-    const result = await dbController.UpdateCollectionsByCollections(orderEquipment, query, update);
+    const result = await dbController.UpdateCollectionsByCollections(shipOrder, query, update);
       // 删除 shipContracts 文件夹下的对应文件
       const filePath = path.join(__dirname, '../shipContracts', req.body.fileName);
       fs.unlinkSync(filePath);
@@ -81,7 +81,7 @@ router.post('/inspectionLoad', upload.single('file'), async(req, res) => {
   const query = { clientName: req.body.clientName, orderDate: req.body.orderDate };
 
   try {
-    var result = await dbController.GetCollectionsByCollections(orderEquipment, query);
+    var result = await dbController.GetCollectionsByCollections(shipOrder, query);
     if(result.length != 0){
       result = result[0].inspectionFiles
       return res.json(result);

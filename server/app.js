@@ -12,6 +12,7 @@ var loginRouter = require('./routes/Login')
 var downupRouter = require('./routes/DownUpload')
 var shipContractsRouter = require('./routes/ShipContracts')
 var shipInspectionRouter = require('./routes/ShipInspection')
+var modulesRouter = require('./routes/Modules')
 
 const MongodbInit = require("./controller/MongodbInit")
 const bodyParser = require('body-parser');
@@ -39,6 +40,7 @@ app.use('/Login',loginRouter);
 app.use('/DownloadAndUpload',downupRouter);
 app.use('/shipContracts',shipContractsRouter);
 app.use('/shipInspection',shipInspectionRouter);
+app.use('/modules',modulesRouter);
 
 
 app.all('*', function (req, res, next) {

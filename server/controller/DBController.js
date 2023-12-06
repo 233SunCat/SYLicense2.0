@@ -4,41 +4,11 @@ async function CreateInsert(dbController, data) {
   var resultStatus;
   const InsertName = new dbController(data)
   await InsertName.save().then(result => {
-      resultStatus = { success: true};
-    }).catch(err => {
-      resultStatus = { success: false};
-    })
+    resultStatus = { success: true };
+  }).catch(err => {
+    resultStatus = { success: false };
+  })
   return resultStatus
-}
-
-//多条更新|条件1
-function Update(dbController, updatedId, updatedDate) {
-    dbController.updateOne({ updatedId }, updatedDate)
-        .then(() => {
-            res.status(200).send('db updated successfully'); // 发送200成功响应  
-        })
-        .catch((error) => {
-            res.status(500).send('db updating fault'); // 发送500错误响应  
-        });
-}
-function UpdateNetwork(dbController, updatedId, updatedDate, ) {
-  dbController.updateOne({ equipmentId: updatedId }, { $set: { equipmentNetwork: 1 ,protectTime: updatedData.protectTime } })
-    .then(() => {
-      console.log('Database updated successfully');
-    })
-    .catch((error) => {
-      console.error('Database update error:', error);
-    });
-}
-
-//多条删除|条件多
-function Delete(dbController, deleteId) {
-    dbController.deleteMany(
-        deleteId,
-        function (err, rs) {
-            console.log(rs);
-        });
-
 }
 /**
  * 条件：多字段单数据，修改：多字段多数据
@@ -52,16 +22,38 @@ async function UpdateCollectionsByCollections(dbController, query, update) {
     return { success: true, modifiedCount: result.nModified };
   } catch (err) {
     console.error('Update error:', err);
+    return { success: false, mess: err.message };
+  }
+}
+/**
+ * query存在，修改，不存在，插入
+ * @param {*} dbController 
+ * @param {*} query 
+ * @param {*} update 
+ * @returns 
+ */
+async function UpdateAndInsertCollectionsByCollections(dbController, query, update) {
+  try {
+    const result = await dbController.updateMany(query, update, { upsert: true });
+    console.log('更新结果：', result.nModified, '条记录已修改');
+
+    // 检查结果对象中是否有upsertedCount
+    const modifiedCount = result.modifiedCount !== undefined ? result.modifiedCount : result.nModified;
+
+    return { success: true, modifiedCount };
+  } catch (err) {
+    console.error('更新错误：', err);
     return { success: false, error: err.message };
   }
 }
 
-// 使用示例
-// const query = {
-//   equipmentId: 'yourEquipmentId', // 替换为你的具体 equipmentId
-//   orderDate: new Date('yourOrderDate'), // 替换为你的具体 orderDate
-// };
-async function GetCollectionsByCollections(dbController,query) {
+/**
+ * 
+ * @param {*} dbController 
+ * @param {*} query {}
+ * @returns [{}]
+ */
+async function GetCollectionsByCollections(dbController, query) {
   try {
     const result = await dbController.find(query);
     return result
@@ -70,100 +62,85 @@ async function GetCollectionsByCollections(dbController,query) {
     return result
   }
 }
+/**
+ * 查询，返回一条数据
+ * @param {*} dbController 
+ * @param {*} query   {}
+ * @returns [{}]
+ */
+async function GetCollectionsOneByCollections(dbController, query, searchKey) {
+  try {
+    const projection = { _id: 0 }; // 定义一个空的投影对象
+
+    // 从searchKey数组中填充投影对象的字段
+    if (Array.isArray(searchKey) && searchKey.length > 0) {
+      searchKey.forEach((field) => {
+        projection[field] = 1; // 将字段添加到投影对象中，值为1表示要返回该字段
+      });
+    }
+    const result = await dbController.findOne(query, projection);
+    if (result === null) {
+      return { success: false, message: '返回错误' }
+    }
+    return { success: true, message: result }
+  } catch (error) {
+    console.error('在findDocuments中发生错误:', error);
+    throw error; // 抛出错误，以便调用方可以处理错误
+  }
+}
+
 
 //多条查询|条件
-async function GetCollectionsByCondition(dbController,keyword,selectedOption) {//searchData[{}],startDate,endDate,selectedOption,keyword
+async function GetCollectionsByCondition(dbController, keyword, selectedOption) {//searchData[{}],startDate,endDate,selectedOption,keyword
   // 创建查询条件
-  const query = {  
+  const query = {
     // faultDate: {  
     //   $gte: startDate,  
     //   $lte: endDate  
     // }  
-  };  
-  if(selectedOption!=''){
+  };
+  if (selectedOption != '') {
     query.status = selectedOption
   }
-  if(keyword!=''){
-    const keywordRegex = new RegExp(keyword, 'i');  
-    query.$or = [  
+  if (keyword != '') {
+    const keywordRegex = new RegExp(keyword, 'i');
+    query.$or = [
       { modelName: { $regex: keywordRegex } }
-    ]; 
+    ];
   }
 
-  try {  
-    const resDate = await dbController.find(query).exec();  
+  try {
+    const resDate = await dbController.find(query).exec();
     //res.json(equipmentDetail); // 将结果以JSON格式返回给客户端 
     return resDate;
-  } catch (error) {  
-    console.error('检索设备详情时出错：', error);  
-    res.status(500).send('服务器错误');  
-  }  
-}
-/**
- * 根绝某个字段的数组，返货多个集合
- * @param {*数据库模型} dbController 
- * @param {*某字段名} propertyName 
- * @param {*某字段数据数组} propertysData 
-
- * @returns 
- */
-async function GetDataByfieldNameAndfieldValues(dbController, fieldName, fieldValues) {
-  try {
-    if (!fieldName || !fieldValues || !Array.isArray(fieldValues) || fieldValues.length === 0) {
-      throw new Error('Field name and a non-empty array of field values are required.');
-    }
-
-    const queryConditions = {
-      [fieldName]: { $in: fieldValues },
-    };
-
-    const result = await dbController.find(queryConditions);
-    return result;
   } catch (error) {
-    console.error('Error in getDataByField:', error);
-    throw error;
+    console.error('检索设备详情时出错：', error);
+    res.status(500).send('服务器错误');
   }
 }
 
 async function GetCollections(dbController) {//searchData[{}],startDate,endDate,selectedOption,keyword
 
-  try {  
-    const resDate = await dbController.find().exec();  
+  try {
+    const resDate = await dbController.find().exec();
     //res.json(equipmentDetail); // 将结果以JSON格式返回给客户端 
     return resDate;
-  } catch (error) {  
-    console.error('检索设备详情时出错：', error);  
-    res.status(500).send('服务器错误');  
-  }  
-}
-async function GetCollectionsByDateRange(dbController, startDate, endDate) {
-  try {
-    // 构建查询条件，限制 eveDate 在 startDate 和 endDate 之间
-    const query = {
-      eventDate: {
-        $gte: startDate,
-        $lte: endDate,
-      },
-    };
-    const result = await dbController.find(query);
-    console.log('Query result:', result);
-    return result;
   } catch (error) {
-    // 处理错误
-    console.error('Error in QueryCollectionsByDateRange:', error);
-    throw error;
+    console.error('检索设备详情时出错：', error);
+    res.status(500).send('服务器错误');
   }
 }
-async function GetCollectionsByKeywordAndDate (dbController, keyword,keywordFields,startDate ,endDate,dateFields ){
+
+async function GetCollectionsByKeywordAndDate(dbController, keyword, keywordFields, startDate, endDate, dateFields) {
   var dynamicConditions
   // 构建动态查询条件
-  if(dateFields.length == 0){
+  if (dateFields.length == 0) {
     dynamicConditions = {
       $and: [
         { $or: keywordFields.map(field => ({ [field]: { $regex: keyword, $options: 'i' } })) }
       ]
     };
-  }else{
+  } else {
     dynamicConditions = {
       $and: [
         { $or: dateFields.map(field => ({ [field]: { $gte: startDate, $lte: endDate } })) },
@@ -171,20 +148,19 @@ async function GetCollectionsByKeywordAndDate (dbController, keyword,keywordFiel
       ]
     };
   }
-
-    return result = await dbController.find(dynamicConditions);
+  return result = await dbController.find(dynamicConditions);
 }
 /**
  * 判断id的值是否存在，存在返回质保期
  */
-async function getProtectTimeByEquipmentId(dbController,equipmentId) {
+async function getProtectTimeByEquipmentId(dbController, equipmentId) {
   try {
     const equipment = await dbController.findOne({ equipmentId });
 
     if (equipment) {
       const protectTime = equipment.protectTime;
       const signforDate = equipment.signforDate
-      return {protectTime,signforDate};
+      return { protectTime, signforDate };
     } else {
       return null; // 如果设备不存在，可以返回 null 或者其他适当的值
     }
@@ -197,11 +173,13 @@ async function getProtectTimeByEquipmentId(dbController,equipmentId) {
  * 样机申请表查询
  */
 
-module.exports = { CreateInsert, Update,GetCollectionsByCondition, Delete, 
-  GetCollections, UpdateNetwork, 
-  GetDataByfieldNameAndfieldValues,
+module.exports = {
+  CreateInsert, GetCollectionsByCondition,
+  GetCollections,
   UpdateCollectionsByCollections,
   GetCollectionsByCollections,
-  GetCollectionsByDateRange,
   GetCollectionsByKeywordAndDate,
-  getProtectTimeByEquipmentId};
+  getProtectTimeByEquipmentId,
+  UpdateAndInsertCollectionsByCollections,
+  GetCollectionsOneByCollections
+};

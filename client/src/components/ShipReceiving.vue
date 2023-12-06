@@ -155,8 +155,7 @@ const onSubmit = () => {
   //EventBus.off('slide-ship-order', handerBus)
 
   axiosServer.AxiosPost(val, '/ShipClient/GetShipReceiving').then(res => {//res = [],如果id存在[{}...]，id不存在[]
-  console.log('res',res)
-  Object.assign(formInline, funBox.FormDisplay(res,formInline,formInlineCopy));
+  Object.assign(formInline, funBox.FormDisplayOne(res,formInline,formInlineCopy));
   })
 }
 EventBus.on('slide-ship-order', handerBus)

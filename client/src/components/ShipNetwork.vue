@@ -98,12 +98,14 @@ function daysToYearsMonthsDays(days: number): { years: number, months: number, d
 }
 
 const formInlineCopy = formInline
+/**
+ * 加载
+ */
 var orderDate = null
 var clientName = ''
 const HanderBus = async (val: any) => {
     orderDate = val.orderDate
     clientName = val.clientName
-    console.log('联网加载')
     //EventBus.off('slide-ship-order', HanderBus);
     axiosServer.AxiosPost(val, '/ShipClient/GetShipNetwork').then(res => {//res = [],如果id存在[{}...]，id不存在[]
       if (res.length != 0) {
@@ -114,14 +116,9 @@ const HanderBus = async (val: any) => {
           .map(item => item.equipmentId);
         formInline.networdkEqNumber = countIsNetwork
         formInline.equipmentIds = isNetworkEquipmentIds
-        console.log('222222')
         const resPop = res.pop()
-        console.log('resPop',resPop)
         if (resPop.protectTime != undefined && resPop.protectTime != '') {
-          console.log('111111111')
           formInline.protectTime = resPop.protectTime
-          console.log('resPop.protectTime',resPop.protectTime)
-          console.log('formInline.protectTime',formInline.protectTime)
         } else {
           formInline.protectTime = 0
         }
@@ -143,7 +140,6 @@ const NetworkUpdate = () => {//提交
   formInline.orderDate = orderDate
   formInline.clientName = clientName
   formInline.equipmentNetwork = equipmentNetwork.value
-  console.log('联网', formInline)
   axiosServer.AxiosPost(qs.stringify(formInline), '/ShipClient/AddShipNetwork').then(res => {
     if (res.success == true) {
       messageBox.MessageBox('保存成功')

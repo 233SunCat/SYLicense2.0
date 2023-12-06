@@ -1,5 +1,5 @@
 <template>
-  <div class="common-layout" style="height: 100%;width: 100%;">
+  <div class="common-layout" style="height: 100%;width: 100%;margin-top: -20px;margin-left: -20px;">
     <el-container style="height: 100%; background-color: #f0f3f4;">
       <el-aside width="200px" style="height: 100%;">
         <SlideMenuTurn />

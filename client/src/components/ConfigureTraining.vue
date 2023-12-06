@@ -1,5 +1,5 @@
 <template>
-  <div class="common-layout" style="height: 80%;">
+  <div class="common-layout" style="height: 100%">
     <el-container style="height: 100%;">
       <el-header style="background-color: #f6f8f8; display: flex; align-items: center; ">
         <el-text class="mx-1" size="large">设备信息</el-text>
@@ -55,7 +55,7 @@
       </el-main>
     </el-container>
   </div>
-  <div class="common-layout" style="height: 100%;">
+  <div class="common-layout" style="height: 100%;margin-top: 20px;">
     <el-container style="height: 100%;">
       <el-header style="background-color: #f6f8f8; display: flex; align-items: center; ">
         <el-text class="mx-1" size="large">样机流转记录</el-text>
@@ -65,15 +65,16 @@
           <!-- 检索条件一排显示 -->
           <el-row :gutter="20" style="width: 100%">
             <el-col :span="3">
-              <el-button type="primary" @click="AddModelTurn">新增样机流转</el-button>
+              <el-button plain @click="AddModelTurn">新增样机流转</el-button>
             </el-col>
-            <el-col :span="16">
-            </el-col>
-            <el-col :span="2">
-              <el-button style="text-align: right" type="primary" icon="el-icon-download">数据查询</el-button>
+            <el-col :span="14">
             </el-col>
             <el-col :span="3">
-              <el-button style="text-align: right" type="primary" icon="el-icon-download">数据导出</el-button>
+              <el-button style="text-align: right" type="primary" icon="el-icon-download">数据查询<el-icon><Search /></el-icon></el-button>
+            </el-col>
+            <el-col :span="3">
+             <ExportExcel :id="'exportTab'" :name="'导出Table'"></ExportExcel>
+              
             </el-col>
           </el-row>
           <!--Excel表格导出-->>
@@ -98,7 +99,9 @@
 <script lang="ts" setup>
 import { ref, reactive, inject } from 'vue'
 import { defineComponent } from 'vue'
-
+import {
+  Search
+} from '@element-plus/icons-vue'
 import axios from "axios";
 import ButtonUpload from '@/components/ButtonUpload.vue'
 import type { FormProps } from 'element-plus'
@@ -109,6 +112,7 @@ import type { UploadProps, UploadUserFile } from 'element-plus'
 import ConfigureTrainingApply from './ConfigureTrainingApply.vue'
 import EventBus from "../assets/common/event-bus"
 import { useRouter } from "vue-router";
+import ExportExcel from "@/components/ExportExcel.vue";
 
 const input = ref('')
 var dialogFormVisible = ref(false)
@@ -156,8 +160,7 @@ const checkAll = ref(false)
 const isIndeterminate = ref(true)
 const checkedCities = ref(['镜头训练', '分离训练'])
 const cities = ['镜头训练', '分离训练', 'FLS技能训练', '剪切训练', '钛夹训练', '电凝训练', '双手合作训练', '抓取训练']
-const fenghecities = ['缝合训练', '打结训练']
-const shoushucities = ['胆囊胆道手术', '打结训练', '妇科手术', '阑尾切除手术', '乙状结肠切除手术']
+
 
 
 const handleCheckAllChange = (val: boolean) => {
@@ -169,16 +172,10 @@ const handleCheckedCitiesChange = (value: string[]) => {
   checkAll.value = checkedCount === cities.length
   isIndeterminate.value = checkedCount > 0 && checkedCount < cities.length
 }
-const selectedOption = ref("");
-const options = ref([
-  { label: "不限制", value: "不限制" },
-  // 其他选项...
-]);
 const num = ref(1)
 const handleChange = (value: number) => {
   console.log(value)
 }
-const buttonContext = ref('初始值');
 
 //slide-menuturn通信模块
 const text = ref([])

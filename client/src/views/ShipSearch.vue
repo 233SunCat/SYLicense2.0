@@ -29,7 +29,7 @@
           {{ item }}</el-checkbox>
       </el-checkbox-group>
     </div>
-    <div class="common-layout" style="height: 100%;">
+    <div class="common-layout" style="height: 100%;margin-top: 30px;">
       <el-container style="height: 100%;">
         <el-header style="background-color: #f6f8f8; display: flex; align-items: center; ">
           <el-text class="mx-1" size="large">发货明细表</el-text>
@@ -56,9 +56,12 @@
               <el-table-column prop="clientName" label="客户名称"></el-table-column>
               <el-table-column prop="orderStatus" label="中标状态"></el-table-column>
               <el-table-column prop="orderDate" label="订单时间" width="160px"></el-table-column>
-              <el-table-column prop="equipmentName" label="订单设备名称"></el-table-column>
-              <el-table-column prop="equipmentId" label="订单设备编号"></el-table-column>
-              <el-table-column prop="equipmentStyle" label="订单设备型号"></el-table-column>
+              <el-table-column prop="equipmentName" label="设备名称"></el-table-column>
+              <el-table-column prop="equipmentId" label="设备编号"></el-table-column>
+              <el-table-column prop="equipmentStyle" label="设备型号"></el-table-column>
+              <el-table-column prop="clientArea" label="客户所属地区"></el-table-column>
+              <el-table-column prop="clientProvince" label="客户所属省份"></el-table-column>
+              <el-table-column prop="clientUrban" label="客户所属市区"></el-table-column>
                 <!-- <template #default="scope">
                     <el-popover effect="light" trigger="hover" placement="top" width="auto">
                         <template #default>
@@ -147,7 +150,7 @@ const startDate = ref(new Date());
 startDate.value.setMonth(startDate.value.getMonth() - 1);
 const endDate = ref(new Date());
 //勾选框
-const userItems = ['用户名称', '订单状态', '订单时间']
+const userItems = ['用户名称', '订单状态', '订单时间','客户所属地区','客户所属省份','客户所属市区']
 const equipmentItems = ['设备名称', '设备型号', '模块信息', '是否联网', '质保期']
 const contractsItems = ['代理商信息', '合同签订日期', '合同签订金额', '中标价格', '付款日期', '服务费']
 const invoiceItems = ['开票情况', '开票日期', '开票编号']
@@ -171,10 +174,10 @@ const emailCheckAll = ref(false)
 
 //勾选框全选
 const handleCheckAllChange0 = (val: boolean) => {
-  formInline.userItems = val ? userItems : []
+  formInline.userItems = val ? userItems : ['用户名称']
 }
 const handleCheckAllChange1 = (val: boolean) => {
-  formInline.equipmentItems = val ? equipmentItems : []
+  formInline.equipmentItems = val ? equipmentItems : ['设备名称', '设备型号']
 }
 const handleCheckAllChange2 = (val: boolean) => {
   formInline.contractsItems = val ? contractsItems : []
@@ -193,6 +196,7 @@ const onSubmit = () => {
 
   const val = { startDate: startDate.value, endDate: endDate.value, keyword: keyword.value, formInline: formInline }
   axiosServer.AxiosPost(qs.stringify(val), '/ShipClient/GetShipSearch').then(res => {
+    console.log('输出用户表格',res)
     equipmentCount.value = res.filter(item => item.equipmentId != '').length;
     // 使用 reduce 函数对 equipmentStyle 进行分类统计
     const styleCount: Record<string, number> = res.reduce((acc, item) => {
@@ -208,7 +212,7 @@ const onSubmit = () => {
       return sum + contractMoney;
     }, 0);
     const totalServiceFee: number = res.reduce((sum, item) => {
-      const serviceFee = parseFloat(item.contractMoney) || 0; // 将字符串转换为数字，如果无法转换则为 0
+      const serviceFee = parseFloat(item.serviceFee) || 0; // 将字符串转换为数字，如果无法转换则为 0
       return sum + serviceFee;
     }, 0);
     equipmentStyleCount.value = styleCount
@@ -227,13 +231,4 @@ const onSubmit = () => {
     });
   })
 }
-// 导出Excel的方法
-const exportToExcel = () => {
-  // 获取 el-table 的列定义
-  // 在这里编写导出Excel的逻辑
-  // const data = tableData.value
-  // const worksheet = XLSX.utils.json_to_sheet(data)
-  // const workbook = { Sheets: { Sheet1: worksheet }, SheetNames: ["Sheet1"] };
-  // XLSX.writeFile(workbook, "exported_data.xlsx");
-};
 </script>

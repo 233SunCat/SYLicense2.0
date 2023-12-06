@@ -19,6 +19,7 @@ const AxiosPost = async (data: Params, path: string): Promise<any> => {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
     });
+    console.log('response',response)
     return response.data;
   } catch (error) {
     throw error; // 抛出错误，以便调用方能够捕获

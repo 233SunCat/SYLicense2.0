@@ -1,5 +1,5 @@
 <template>
-    <el-button type="primary"  :loading="downloadLoading" icon="el-icon-top-right" size="small" @click="exportExcel">导出</el-button>
+    <el-button type="primary"  :loading="downloadLoading" icon="el-icon-top-right" @click="exportExcel">数据导出</el-button>
 </template>
 
 <script>

@@ -18,10 +18,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import SideMenu from '@/views/SideMenu.vue'
-import ForceFeedback from '@/views/ForceFeedback.vue'
-import UserAdd from '@/views/ShipAdd.vue'
-import EquipmentSubmit from './views/EquipmentSubmit.vue'
-import EquipmentSearch from './views/EquipmentSearch.vue'
+
 export default defineComponent({
   name: 'App',
   components: {
